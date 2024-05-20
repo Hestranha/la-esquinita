@@ -1,7 +1,7 @@
-import ContentVentas from "../ui/ventas/ventas";
+import ContentCompras from "../ui/compras/compras";
 
 export default function Inicio() {
   return (
-    <ContentVentas />
+    <ContentCompras />
   );
 }

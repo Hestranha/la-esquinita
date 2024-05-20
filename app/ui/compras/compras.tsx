@@ -4,7 +4,7 @@ import { Select, SelectItem, Input, Table, TableHeader, TableColumn, TableBody, 
 import { DeleteIcon } from "../components/DeleteIcon";
 import { getLocalTimeZone, now } from "@internationalized/date";
 
-export default function ContentVentas() {
+export default function ContentCompras() {
     const rows = [
         {
             key: 1,
