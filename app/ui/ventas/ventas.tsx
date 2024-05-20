@@ -178,24 +178,26 @@ export default function ContentVentas() {
                 <h2 className="text-white font-bold">Registro de ventas</h2>
             </header>
             <article className="flex flex-col gap-4 p-4">
-                <section className="flex flex-col lg:flex-row gap-4 lg:items-center">
+                <section className="flex flex-col lg:flex-row gap-4 lg:items-start">
                     <Select
                         isRequired
                         items={animals}
                         label="Producto"
+                        size="sm"
                         placeholder="Selecciona un producto"
                     >
                         {(animal: { value: number, label: string }) => (
                             <SelectItem key={animal.value}>{animal.label}</SelectItem>
                         )}
                     </Select>
-                    <Input isRequired type="number" label="Cantidad" placeholder="Ingresa la cantidad" />
+                    <Input isRequired type="number" size="sm" label="Cantidad" placeholder="Ingresa la cantidad" />
                     <Input
                         isReadOnly
                         type="number"
                         label="Precio unitario"
                         color="primary"
                         placeholder="0.00"
+                        size="sm"
                         endContent={
                             <div className="pointer-events-none flex items-center">
                                 <span className="text-default-400 text-small">S/.</span>

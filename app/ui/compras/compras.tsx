@@ -178,23 +178,26 @@ export default function ContentCompras() {
                 <h2 className="text-white font-bold">Registro de compras</h2>
             </header>
             <article className="flex flex-col gap-4 p-4">
-                <section className="flex flex-col lg:flex-row gap-4 lg:items-center">
+                <section className="flex flex-col lg:flex-row gap-4 lg:items-start">
                     <Select
                         isRequired
                         items={animals}
                         label="Producto"
+                        size="sm"
                         placeholder="Selecciona un producto"
                     >
                         {(animal: { value: number, label: string }) => (
                             <SelectItem key={animal.value}>{animal.label}</SelectItem>
                         )}
                     </Select>
-                    <Input isRequired type="number" label="Cantidad" placeholder="Ingresa la cantidad" />
+                    <Input isRequired type="number" size="sm" label="Cantidad" placeholder="Ingresa la cantidad" />
                     <Input
                         isRequired
                         type="number"
                         label="Precio compra"
                         placeholder="0.00"
+                        size="sm"
+                        description="Se actualizará cuando seleccione un producto."
                         endContent={
                             <div className="pointer-events-none flex items-center">
                                 <span className="text-default-400 text-small">S/.</span>
@@ -225,8 +228,8 @@ export default function ContentCompras() {
                             <Input
                                 isRequired
                                 type="text"
-                                label="Cliente"
-                                placeholder="Ingresa el nombre del Cliente"
+                                label="Proveedor"
+                                placeholder="Ingresa el nombre del Proveedor"
                             />
                         </div>
                         <div className="flex gap-4">
