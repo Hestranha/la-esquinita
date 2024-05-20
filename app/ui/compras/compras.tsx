@@ -175,7 +175,7 @@ export default function ContentCompras() {
     return (
         <section className="flex flex-col bg-white rounded-md">
             <header className="bg-pink-500 p-4 rounded-tl-md rounded-tr-md ">
-                <h2 className="text-white font-bold">Registro de ventas</h2>
+                <h2 className="text-white font-bold">Registro de compras</h2>
             </header>
             <article className="flex flex-col gap-4 p-4">
                 <section className="flex flex-col lg:flex-row gap-4 lg:items-center">
@@ -183,18 +183,17 @@ export default function ContentCompras() {
                         isRequired
                         items={animals}
                         label="Producto"
-                        placeholder="Seleccione un producto"
+                        placeholder="Selecciona un producto"
                     >
                         {(animal: { value: number, label: string }) => (
                             <SelectItem key={animal.value}>{animal.label}</SelectItem>
                         )}
                     </Select>
-                    <Input isRequired type="number" label="Cantidad" placeholder="Ingrese la cantidad" />
+                    <Input isRequired type="number" label="Cantidad" placeholder="Ingresa la cantidad" />
                     <Input
-                        isReadOnly
+                        isRequired
                         type="number"
-                        label="Precio unitario"
-                        color="primary"
+                        label="Precio compra"
                         placeholder="0.00"
                         endContent={
                             <div className="pointer-events-none flex items-center">
@@ -221,68 +220,40 @@ export default function ContentCompras() {
                     </Table>
                 </section>
                 <section className="flex flex-col xl:grid xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-                    <div className="flex flex-col gap-4 xl:col-span-2 2xl:col-span-3">
+                    <div className="flex flex-col gap-4 xl:col-span-2">
                         <div className="flex flex-col md:flex-row gap-4">
                             <Input
                                 isRequired
                                 type="text"
                                 label="Cliente"
-                                placeholder="Ingrese el nombre del Cliente"
+                                placeholder="Ingresa el nombre del Cliente"
                             />
-                            <Select
-                                isRequired
-                                label="Método de Entrega"
-                                placeholder="Seleccione el método de entrega"
-                                defaultSelectedKeys={[1]}
-                            >
-                                {metodosEntrega.map((opcion: { value: number, label: string }) => (
-                                    <SelectItem key={opcion.value} value={opcion.value}>{opcion.label}</SelectItem>
-                                ))}
-                            </Select>
-
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
+                        <div className="flex gap-4">
                             <Input
-                                isRequired
-                                type="text"
-                                label="Dirección"
-                                className="md:col-span-4"
-                                placeholder="Ingrese la dirección del Cliente"
-                            />
-                            <Input
-                                isRequired
-                                type="number"
-                                label="Celular"
-                                className="md:col-span-3"
-                                placeholder="Ingrese el número del Cliente"
+                                type="file"
+                                label="Foto de Factura"
+                                placeholder="Suba la foto de la Factura"
                             />
                         </div>
                     </div>
-                    <div className="flex flex-col gap-4 xl:col-span-1">
+                    <div className="flex gap-4 xl:col-span-1 2xl:col-span-2">
                         <Select
                             isRequired
                             items={metodosPago}
                             label="Método de pago"
-                            placeholder="Seleccione el método pago"
+                            placeholder="Selecciona el método pago"
                         >
                             {(animal: { value: number, label: string }) => (
                                 <SelectItem key={animal.value}>{animal.label}</SelectItem>
                             )}
                         </Select>
-                        <Input
-                            isRequired
-                            type="number"
-                            label="Celular"
-                            className="md:col-span-3"
-                            placeholder="Ingrese el número del Cliente"
-                        />
                     </div>
-                    <div className="flex flex-col md:flex-row xl:flex-col gap-4 xl:col-span-1">
+                    <div className="flex flex-col sm:flex-row xl:flex-col gap-4 xl:col-span-1">
                         <DatePicker
-                            isReadOnly
+                            isRequired
                             label="Fecha"
                             hideTimeZone
-                            color="primary"
                             showMonthAndYearPickers
                             defaultValue={now(getLocalTimeZone())}
                         />
@@ -302,13 +273,13 @@ export default function ContentCompras() {
                 </section>
                 <section className="flex flex-col lg:flex-row gap-4 justify-end">
                     <Button color="warning" size="lg">
-                        Cancelar Venta
+                        Cancelar Compra
                     </Button>
                     <Button color="secondary" size="lg">
-                        Borrador Venta
+                        Borrador Compra
                     </Button>
                     <Button color="success" size="lg">
-                        Registrar Venta
+                        Registrar Compra
                     </Button>
                 </section>
             </article>

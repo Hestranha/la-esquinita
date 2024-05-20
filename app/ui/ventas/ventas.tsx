@@ -183,13 +183,13 @@ export default function ContentVentas() {
                         isRequired
                         items={animals}
                         label="Producto"
-                        placeholder="Seleccione un producto"
+                        placeholder="Selecciona un producto"
                     >
                         {(animal: { value: number, label: string }) => (
                             <SelectItem key={animal.value}>{animal.label}</SelectItem>
                         )}
                     </Select>
-                    <Input isRequired type="number" label="Cantidad" placeholder="Ingrese la cantidad" />
+                    <Input isRequired type="number" label="Cantidad" placeholder="Ingresa la cantidad" />
                     <Input
                         isReadOnly
                         type="number"
@@ -227,12 +227,12 @@ export default function ContentVentas() {
                                 isRequired
                                 type="text"
                                 label="Cliente"
-                                placeholder="Ingrese el nombre del Cliente"
+                                placeholder="Ingresa el nombre del Cliente"
                             />
                             <Select
                                 isRequired
                                 label="Método de Entrega"
-                                placeholder="Seleccione el método de entrega"
+                                placeholder="Selecciona el método de entrega"
                                 defaultSelectedKeys={[1]}
                             >
                                 {metodosEntrega.map((opcion: { value: number, label: string }) => (
@@ -247,14 +247,14 @@ export default function ContentVentas() {
                                 type="text"
                                 label="Dirección"
                                 className="md:col-span-4"
-                                placeholder="Ingrese la dirección del Cliente"
+                                placeholder="Ingresa la dirección del Cliente"
                             />
                             <Input
                                 isRequired
                                 type="number"
                                 label="Celular"
                                 className="md:col-span-3"
-                                placeholder="Ingrese el número del Cliente"
+                                placeholder="Ingresa el número del Cliente"
                             />
                         </div>
                     </div>
@@ -263,7 +263,7 @@ export default function ContentVentas() {
                             isRequired
                             items={metodosPago}
                             label="Método de pago"
-                            placeholder="Seleccione el método pago"
+                            placeholder="Selecciona el método pago"
                         >
                             {(animal: { value: number, label: string }) => (
                                 <SelectItem key={animal.value}>{animal.label}</SelectItem>
@@ -274,7 +274,7 @@ export default function ContentVentas() {
                             type="number"
                             label="Celular"
                             className="md:col-span-3"
-                            placeholder="Ingrese el número del Cliente"
+                            placeholder="Ingresa el número del Cliente"
                         />
                     </div>
                     <div className="flex flex-col md:flex-row xl:flex-col gap-4 xl:col-span-1">
