@@ -1,3 +1,5 @@
+import { comfortaa } from "./ui/fonts";
+import "./ui/global.css"
 export default function RootLayout({
   children,
 }: {
@@ -5,7 +7,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={`${comfortaa.className} antialiased`}>{children}</body>
     </html>
   );
 }
