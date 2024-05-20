@@ -45,7 +45,7 @@ export default function ContentVentas() {
                         isRequired
                         items={animals}
                         label="Producto"
-                        placeholder="Selecciona un producto"
+                        placeholder="Seleccione un producto"
                     >
                         {(animal: { value: number, label: string }) => (
                             <SelectItem key={animal.value}>{animal.label}</SelectItem>
@@ -104,7 +104,7 @@ export default function ContentVentas() {
                             <Select
                                 isRequired
                                 label="Método de Entrega"
-                                placeholder="Selecciona el método de entrega"
+                                placeholder="Seleccione el método de entrega"
                                 defaultSelectedKeys={[1]}
                             >
                                 {metodosEntrega.map((opcion: { value: number, label: string }) => (
@@ -113,24 +113,41 @@ export default function ContentVentas() {
                             </Select>
 
                         </div>
-                        <Input
-                            isRequired
-                            type="text"
-                            label="Dirección"
-                            placeholder="Ingrese la dirección del Cliente"
-                        />
+                        <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
+                            <Input
+                                isRequired
+                                type="text"
+                                label="Dirección"
+                                className="md:col-span-4"
+                                placeholder="Ingrese la dirección del Cliente"
+                            />
+                            <Input
+                                isRequired
+                                type="number"
+                                label="Celular"
+                                className="md:col-span-3"
+                                placeholder="Ingrese el número del Cliente"
+                            />
+                        </div>
                     </div>
-                    <div className="xl:col-span-1">
+                    <div className="flex flex-col gap-4 xl:col-span-1">
                         <Select
                             isRequired
                             items={metodosPago}
                             label="Método de pago"
-                            placeholder="Selecciona el método pago"
+                            placeholder="Seleccione el método pago"
                         >
                             {(animal: { value: number, label: string }) => (
                                 <SelectItem key={animal.value}>{animal.label}</SelectItem>
                             )}
                         </Select>
+                        <Input
+                            isRequired
+                            type="number"
+                            label="Celular"
+                            className="md:col-span-3"
+                            placeholder="Ingrese el número del Cliente"
+                        />
                     </div>
                     <div className="flex flex-col md:flex-row xl:flex-col gap-4 xl:col-span-1">
                         <DatePicker
@@ -158,6 +175,9 @@ export default function ContentVentas() {
                 <section className="flex flex-col lg:flex-row gap-4 justify-end">
                     <Button color="warning" size="lg">
                         Cancelar Venta
+                    </Button>
+                    <Button color="secondary" size="lg">
+                        Borrador Venta
                     </Button>
                     <Button color="success" size="lg">
                         Registrar Venta
