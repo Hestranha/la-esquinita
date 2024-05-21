@@ -1,5 +1,8 @@
 "use client";
 import React from "react";
+import { usePathname } from "next/navigation";
+// className={`${pathname === '/' ? 'hover:bg-blue-gray-50 hover:bg-opacity-80 hover:text-blue-gray-900' : ''}`}
+// className={`${pathname.startsWith('/ventas') ? 'hover:bg-blue-gray-50 hover:bg-opacity-80 hover:text-blue-gray-900' : ''}`}
 import {
     Card,
     Typography,
@@ -25,6 +28,7 @@ import Link from "next/link";
 
 export function MultiLevelSidebar() {
     const [open, setOpen] = React.useState(0);
+    const pathname = usePathname();
 
     const handleOpen = (value: number) => {
         setOpen(open === value ? 0 : value);
@@ -41,7 +45,7 @@ export function MultiLevelSidebar() {
             </Link>
             <List>
                 <Link href="/ventas">
-                    <ListItem>
+                    <ListItem className={`${pathname.startsWith('/ventas') ? 'bg-blue-gray-50 bg-opacity-80 text-blue-gray-900' : ''}`}>
                         <ListItemPrefix>
                             <UserCircleIcon className="h-5 w-5" />
                         </ListItemPrefix>
@@ -49,7 +53,7 @@ export function MultiLevelSidebar() {
                     </ListItem>
                 </Link>
                 <Link href="/compras">
-                    <ListItem>
+                    <ListItem className={`${pathname.startsWith('/compras') ? 'bg-blue-gray-50 bg-opacity-80 text-blue-gray-900' : ''}`}>
                         <ListItemPrefix>
                             <Cog6ToothIcon className="h-5 w-5" />
                         </ListItemPrefix>
