@@ -22,10 +22,12 @@ import {
 } from "@nextui-org/react";
 import { columns, users, statusOptions } from "./data";
 import { capitalize } from "./utils";
-import { VerticalDotsIcon } from "../../components/VerticalDotsIcon";
 import { SearchIcon } from "../../components/SearchIcon";
 import { ChevronDownIcon } from "../../components/ChevronDownIcon";
 import { PlusIcon } from "../../components/PlusIcon";
+import { EyeIcon } from "../../components/EyeIcon";
+import { EditIcon } from "../../components/EditIcon";
+import { DeleteIcon } from "../../components/DeleteIcon";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
     active: "success",
@@ -33,13 +35,12 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
     vacation: "warning",
 };
 
-const INITIAL_VISIBLE_COLUMNS = ["name", "role", "status", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["id", "name", "role", "status", "actions"];
 
 type User = typeof users[0];
 
 export default function App() {
     const [filterValue, setFilterValue] = React.useState("");
-    const [selectedKeys, setSelectedKeys] = React.useState<Selection>(new Set([]));
     const [visibleColumns, setVisibleColumns] = React.useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
     const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -123,19 +124,16 @@ export default function App() {
                 );
             case "actions":
                 return (
-                    <div className="relative flex justify-end items-center gap-2">
-                        <Dropdown>
-                            <DropdownTrigger>
-                                <Button isIconOnly className="text-default-300" size="sm" variant="light">
-                                    <VerticalDotsIcon size={24} width={24} height={24} />
-                                </Button>
-                            </DropdownTrigger>
-                            <DropdownMenu>
-                                <DropdownItem>View</DropdownItem>
-                                <DropdownItem>Edit</DropdownItem>
-                                <DropdownItem>Delete</DropdownItem>
-                            </DropdownMenu>
-                        </Dropdown>
+                    <div className="relative flex items-center gap-2">
+                        <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                            <EyeIcon />
+                        </span>
+                        <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                            <EditIcon />
+                        </span>
+                        <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                            <DeleteIcon />
+                        </span>
                     </div>
                 );
             default:
@@ -291,12 +289,9 @@ export default function App() {
                     classNames={{
                         wrapper: "max-h-[382px]",
                     }}
-                    selectedKeys={selectedKeys}
-                    selectionMode="multiple"
                     sortDescriptor={sortDescriptor}
                     topContent={topContent}
                     topContentPlacement="outside"
-                    onSelectionChange={setSelectedKeys}
                     onSortChange={setSortDescriptor}
                 >
                     <TableHeader columns={headerColumns}>
@@ -310,7 +305,7 @@ export default function App() {
                             </TableColumn>
                         )}
                     </TableHeader>
-                    <TableBody emptyContent={"No users found"} items={sortedItems}>
+                    <TableBody emptyContent={"No se encontraron compras"} items={sortedItems}>
                         {(item) => (
                             <TableRow key={item.id}>
                                 {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}

@@ -1,318 +1,318 @@
 "use client";
 import React from "react";
-import { Select, SelectItem, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip, Button, DatePicker, getKeyValue } from "@nextui-org/react";
+import {
+    Table,
+    TableHeader,
+    TableColumn,
+    TableBody,
+    TableRow,
+    TableCell,
+    Input,
+    Button,
+    DropdownTrigger,
+    Dropdown,
+    DropdownMenu,
+    DropdownItem,
+    Chip,
+    User,
+    Pagination,
+    Selection,
+    ChipProps,
+    SortDescriptor
+} from "@nextui-org/react";
+import { columns, users, statusOptions } from "./data";
+import { capitalize } from "./utils";
+import { SearchIcon } from "../../components/SearchIcon";
+import { ChevronDownIcon } from "../../components/ChevronDownIcon";
+import { PlusIcon } from "../../components/PlusIcon";
+import { EyeIcon } from "../../components/EyeIcon";
+import { EditIcon } from "../../components/EditIcon";
 import { DeleteIcon } from "../../components/DeleteIcon";
-import { getLocalTimeZone, now } from "@internationalized/date";
 
-export default function ContentMovimientosVentas() {
-    const rows = [
-        {
-            key: 1,
-            cantidad: 5,
-            producto: "Producto 1",
-            precio_unitario: 10.50,
-            importe: 52.50,
-            eliminar:
-                <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                    <DeleteIcon />
-                </span>
-        },
-        {
-            key: 2,
-            cantidad: 3,
-            producto: "Producto 2",
-            precio_unitario: 7.25,
-            importe: 21.75,
-            eliminar:
-                <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                    <DeleteIcon />
-                </span>
-        },
-        {
-            key: 3,
-            cantidad: 8,
-            producto: "Producto 3",
-            precio_unitario: 15.80,
-            importe: 126.40,
-            eliminar:
-                <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                    <DeleteIcon />
-                </span>
-        },
-        {
-            key: 4,
-            cantidad: 2,
-            producto: "Producto 4",
-            precio_unitario: 20.00,
-            importe: 40.00,
-            eliminar:
-                <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                    <DeleteIcon />
-                </span>
-        },
-        {
-            key: 5,
-            cantidad: 6,
-            producto: "Producto 5",
-            precio_unitario: 12.45,
-            importe: 74.70,
-            eliminar:
-                <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                    <DeleteIcon />
-                </span>
-        },
-        {
-            key: 6,
-            cantidad: 4,
-            producto: "Producto 6",
-            precio_unitario: 9.99,
-            importe: 39.96,
-            eliminar:
-                <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                    <DeleteIcon />
-                </span>
-        },
-        {
-            key: 7,
-            cantidad: 7,
-            producto: "Producto 7",
-            precio_unitario: 18.75,
-            importe: 131.25,
-            eliminar:
-                <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                    <DeleteIcon />
-                </span>
-        },
-        {
-            key: 8,
-            cantidad: 1,
-            producto: "Producto 8",
-            precio_unitario: 25.50,
-            importe: 25.50,
-            eliminar:
-                <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                    <DeleteIcon />
-                </span>
-        },
-        {
-            key: 9,
-            cantidad: 9,
-            producto: "Producto 9",
-            precio_unitario: 11.20,
-            importe: 100.80,
-            eliminar:
-                <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                    <DeleteIcon />
-                </span>
-        },
-        {
-            key: 10,
-            cantidad: 3,
-            producto: "Producto 10",
-            precio_unitario: 14.75,
-            importe: 44.25,
-            eliminar:
-                <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                    <DeleteIcon />
-                </span>
-        },
-    ];
+const statusColorMap: Record<string, ChipProps["color"]> = {
+    active: "success",
+    paused: "danger",
+    vacation: "warning",
+};
 
-    const columns = [
-        {
-            key: "cantidad",
-            label: "CANTIDAD",
-        },
-        {
-            key: "producto",
-            label: "PRODUCTO",
-        },
-        {
-            key: "precio_unitario",
-            label: "P. UNIT",
-        },
-        {
-            key: "importe",
-            label: "IMPORTE",
-        },
-        {
-            key: "eliminar",
-            label:
-                <span className="text-lg">
-                    <DeleteIcon />
-                </span>,
+const INITIAL_VISIBLE_COLUMNS = ["id", "name", "role", "status", "actions"];
+
+type User = typeof users[0];
+
+export default function App() {
+    const [filterValue, setFilterValue] = React.useState("");
+    const [visibleColumns, setVisibleColumns] = React.useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
+    const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
+    const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
+        column: "age",
+        direction: "ascending",
+    });
+
+    const [page, setPage] = React.useState(1);
+
+    const hasSearchFilter = Boolean(filterValue);
+
+    const headerColumns = React.useMemo(() => {
+        if (visibleColumns === "all") return columns;
+
+        return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
+    }, [visibleColumns]);
+
+    const filteredItems = React.useMemo(() => {
+        let filteredUsers = [...users];
+
+        if (hasSearchFilter) {
+            filteredUsers = filteredUsers.filter((user) =>
+                user.name.toLowerCase().includes(filterValue.toLowerCase()),
+            );
         }
-    ];
-    const animals = [
-        { value: 1, label: "Perro" },
-        { value: 2, label: "Gato" },
-        { value: 3, label: "Pájaro" },
-        { value: 4, label: "Conejo" },
-        { value: 5, label: "Hamster" },
-        { value: 6, label: "Perro" },
-        { value: 7, label: "Gato" },
-        { value: 8, label: "Pájaro" },
-        { value: 9, label: "Conejo" },
-        { value: 10, label: "Perro" },
-        { value: 11, label: "Gato" },
-        { value: 12, label: "Pájaro" },
-        { value: 13, label: "Conejo" },
-        { value: 14, label: "Perro" },
-        { value: 15, label: "Gato" },
-        { value: 16, label: "Pájaro" },
-    ];
-    const metodosPago = [
-        { value: 1, label: "Efectivo" },
-        { value: 2, label: "Yape" },
-        { value: 3, label: "Otros" }
-    ];
-    const metodosEntrega = [
-        { value: 1, label: "En Tienda" },
-        { value: 2, label: "Envío" },
-        { value: 3, label: "Otros" }
-    ];
+        if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
+            filteredUsers = filteredUsers.filter((user) =>
+                Array.from(statusFilter).includes(user.status),
+            );
+        }
+
+        return filteredUsers;
+    }, [hasSearchFilter, statusFilter, filterValue]);
+
+    const pages = Math.ceil(filteredItems.length / rowsPerPage);
+
+    const items = React.useMemo(() => {
+        const start = (page - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+
+        return filteredItems.slice(start, end);
+    }, [page, filteredItems, rowsPerPage]);
+
+    const sortedItems = React.useMemo(() => {
+        return [...items].sort((a: User, b: User) => {
+            const first = a[sortDescriptor.column as keyof User] as number;
+            const second = b[sortDescriptor.column as keyof User] as number;
+            const cmp = first < second ? -1 : first > second ? 1 : 0;
+
+            return sortDescriptor.direction === "descending" ? -cmp : cmp;
+        });
+    }, [sortDescriptor, items]);
+
+    const renderCell = React.useCallback((user: User, columnKey: React.Key) => {
+        const cellValue = user[columnKey as keyof User];
+
+        switch (columnKey) {
+            case "name":
+                return (
+                    <User
+                        avatarProps={{ radius: "lg", src: user.avatar }}
+                        description={user.email}
+                        name={cellValue}
+                    >
+                        {user.email}
+                    </User>
+                );
+            case "role":
+                return (
+                    <div className="flex flex-col">
+                        <p className="text-bold text-small capitalize">{cellValue}</p>
+                        <p className="text-bold text-tiny capitalize text-default-400">{user.team}</p>
+                    </div>
+                );
+            case "status":
+                return (
+                    <Chip className="capitalize" color={statusColorMap[user.status]} size="sm" variant="flat">
+                        {cellValue}
+                    </Chip>
+                );
+            case "actions":
+                return (
+                    <div className="relative flex items-center gap-2">
+                        <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                            <EyeIcon />
+                        </span>
+                        <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                            <EditIcon />
+                        </span>
+                        <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                            <DeleteIcon />
+                        </span>
+                    </div>
+                );
+            default:
+                return cellValue;
+        }
+    }, []);
+
+    const onNextPage = React.useCallback(() => {
+        if (page < pages) {
+            setPage(page + 1);
+        }
+    }, [page, pages]);
+
+    const onPreviousPage = React.useCallback(() => {
+        if (page > 1) {
+            setPage(page - 1);
+        }
+    }, [page]);
+
+    const onRowsPerPageChange = React.useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+        setRowsPerPage(Number(e.target.value));
+        setPage(1);
+    }, []);
+
+    const onSearchChange = React.useCallback((value?: string) => {
+        if (value) {
+            setFilterValue(value);
+            setPage(1);
+        } else {
+            setFilterValue("");
+        }
+    }, []);
+
+    const onClear = React.useCallback(() => {
+        setFilterValue("")
+        setPage(1)
+    }, [])
+
+    const topContent = React.useMemo(() => {
+        return (
+            <div className="flex flex-col gap-4">
+                <div className="flex justify-between gap-3 items-end">
+                    <Input
+                        isClearable
+                        className="w-full sm:max-w-[44%]"
+                        placeholder="Busca una venta..."
+                        startContent={<SearchIcon />}
+                        value={filterValue}
+                        onClear={() => onClear()}
+                        onValueChange={onSearchChange}
+                    />
+                    <div className="flex gap-3">
+                        <Dropdown>
+                            <DropdownTrigger className="hidden sm:flex">
+                                <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
+                                    Status
+                                </Button>
+                            </DropdownTrigger>
+                            <DropdownMenu
+                                disallowEmptySelection
+                                aria-label="Table Columns"
+                                closeOnSelect={false}
+                                selectedKeys={statusFilter}
+                                selectionMode="multiple"
+                                onSelectionChange={setStatusFilter}
+                            >
+                                {statusOptions.map((status) => (
+                                    <DropdownItem key={status.uid} className="capitalize">
+                                        {capitalize(status.name)}
+                                    </DropdownItem>
+                                ))}
+                            </DropdownMenu>
+                        </Dropdown>
+                        <Dropdown>
+                            <DropdownTrigger className="hidden sm:flex">
+                                <Button endContent={<ChevronDownIcon className="text-small" />} variant="flat">
+                                    Columnas
+                                </Button>
+                            </DropdownTrigger>
+                            <DropdownMenu
+                                disallowEmptySelection
+                                aria-label="Table Columns"
+                                closeOnSelect={false}
+                                selectedKeys={visibleColumns}
+                                selectionMode="multiple"
+                                onSelectionChange={setVisibleColumns}
+                            >
+                                {columns.map((column) => (
+                                    <DropdownItem key={column.uid} className="capitalize">
+                                        {capitalize(column.name)}
+                                    </DropdownItem>
+                                ))}
+                            </DropdownMenu>
+                        </Dropdown>
+                        <Button color="danger" endContent={<PlusIcon size={24} width={24} height={24} />}>
+                            Agregar Nuevo
+                        </Button>
+                    </div>
+                </div>
+                <div className="flex justify-between items-center">
+                    <span className="text-default-400 text-small">Total {users.length} ventas</span>
+                    <label className="flex items-center text-default-400 text-small">
+                        Filas por página:
+                        <select
+                            className="bg-transparent outline-none text-default-400 text-small"
+                            onChange={onRowsPerPageChange}
+                        >
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+        );
+    }, [filterValue, onSearchChange, statusFilter, visibleColumns, onRowsPerPageChange, onClear]);
+
+    const bottomContent = React.useMemo(() => {
+        return (
+            <div className="py-2 px-2 flex justify-between items-center">
+                <Pagination
+                    isCompact
+                    showControls
+                    showShadow
+                    color="danger"
+                    page={page}
+                    total={pages}
+                    onChange={setPage}
+                />
+                <div className="hidden sm:flex w-[30%] justify-end gap-2">
+                    <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onPreviousPage}>
+                        Anterior
+                    </Button>
+                    <Button isDisabled={pages === 1} size="sm" variant="flat" onPress={onNextPage}>
+                        Siguiente
+                    </Button>
+                </div>
+            </div>
+        );
+    }, [page, pages, onPreviousPage, onNextPage]);
 
     return (
         <section className="flex flex-col bg-white rounded-md">
-            <header className="bg-pink-500 p-4 rounded-tl-md rounded-tr-md ">
-                <h2 className="text-white font-bold">Registro de ventas</h2>
+            <header className="bg-pink-50 p-4 rounded-tl-md rounded-tr-md ">
+                <h2 className="text-pink-500 font-bold uppercase">Historial de ventas</h2>
             </header>
             <article className="flex flex-col gap-4 p-4">
-                <section className="flex flex-col lg:flex-row gap-4 lg:items-start">
-                    <Select
-                        isRequired
-                        items={animals}
-                        label="Producto"
-                        size="sm"
-                        placeholder="Selecciona un producto"
-                    >
-                        {(animal: { value: number, label: string }) => (
-                            <SelectItem key={animal.value}>{animal.label}</SelectItem>
-                        )}
-                    </Select>
-                    <Input isRequired type="number" size="sm" label="Cantidad" placeholder="Ingresa la cantidad" />
-                    <Input
-                        isReadOnly
-                        type="number"
-                        label="Precio unitario"
-                        color="primary"
-                        placeholder="0.00"
-                        size="sm"
-                        endContent={
-                            <div className="pointer-events-none flex items-center">
-                                <span className="text-default-400 text-small">S/.</span>
-                            </div>
-                        }
-                    />
-                    <Button color="danger" size="lg">
-                        Agregar
-                    </Button>
-                </section>
-                <section className="">
-                    <Table aria-label="Example empty table">
-                        <TableHeader columns={columns}>
-                            {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
-                        </TableHeader>
-                        <TableBody emptyContent={"No se agregó ningún producto."} items={rows}>
-                            {(item) => (
-                                <TableRow key={item.key}>
-                                    {(columnKey) => <TableCell>{getKeyValue(item, columnKey)}</TableCell>}
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </section>
-                <section className="flex flex-col xl:grid xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-                    <div className="flex flex-col gap-4 xl:col-span-2 2xl:col-span-3">
-                        <div className="flex flex-col md:flex-row gap-4">
-                            <Input
-                                isRequired
-                                type="text"
-                                label="Cliente"
-                                placeholder="Ingresa el nombre del Cliente"
-                            />
-                            <Select
-                                isRequired
-                                label="Método de Entrega"
-                                placeholder="Selecciona el método de entrega"
-                                defaultSelectedKeys={[1]}
+                <Table
+                    aria-label="Example table with custom cells, pagination and sorting"
+                    isHeaderSticky
+                    bottomContent={bottomContent}
+                    bottomContentPlacement="outside"
+                    classNames={{
+                        wrapper: "max-h-[382px]",
+                    }}
+                    sortDescriptor={sortDescriptor}
+                    topContent={topContent}
+                    topContentPlacement="outside"
+                    onSortChange={setSortDescriptor}
+                >
+                    <TableHeader columns={headerColumns}>
+                        {(column) => (
+                            <TableColumn
+                                key={column.uid}
+                                align={column.uid === "actions" ? "center" : "start"}
+                                allowsSorting={column.sortable}
                             >
-                                {metodosEntrega.map((opcion: { value: number, label: string }) => (
-                                    <SelectItem key={opcion.value} value={opcion.value}>{opcion.label}</SelectItem>
-                                ))}
-                            </Select>
-
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
-                            <Input
-                                isRequired
-                                type="text"
-                                label="Dirección"
-                                className="md:col-span-4"
-                                placeholder="Ingresa la dirección del Cliente"
-                            />
-                            <Input
-                                isRequired
-                                type="number"
-                                label="Celular"
-                                className="md:col-span-3"
-                                placeholder="Ingresa el número del Cliente"
-                            />
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-4 xl:col-span-1">
-                        <Select
-                            isRequired
-                            items={metodosPago}
-                            label="Método de pago"
-                            placeholder="Selecciona el método pago"
-                        >
-                            {(animal: { value: number, label: string }) => (
-                                <SelectItem key={animal.value}>{animal.label}</SelectItem>
-                            )}
-                        </Select>
-                        <Input
-                            isRequired
-                            type="number"
-                            label="Celular"
-                            className="md:col-span-3"
-                            placeholder="Ingresa el número del Cliente"
-                        />
-                    </div>
-                    <div className="flex flex-col md:flex-row xl:flex-col gap-4 xl:col-span-1">
-                        <DatePicker
-                            isReadOnly
-                            label="Fecha"
-                            hideTimeZone
-                            color="primary"
-                            showMonthAndYearPickers
-                            defaultValue={now(getLocalTimeZone())}
-                        />
-                        <Input
-                            isReadOnly
-                            type="number"
-                            label="Total"
-                            color="success"
-                            placeholder="0.00"
-                            endContent={
-                                <div className="pointer-events-none flex items-center">
-                                    <span className="text-default-400 text-small">S/.</span>
-                                </div>
-                            }
-                        />
-                    </div>
-                </section>
-                <section className="flex flex-col lg:flex-row gap-4 justify-end">
-                    <Button color="warning" size="lg">
-                        Cancelar Venta
-                    </Button>
-                    <Button color="secondary" size="lg">
-                        Borrador Venta
-                    </Button>
-                    <Button color="success" size="lg">
-                        Registrar Venta
-                    </Button>
-                </section>
+                                {column.name}
+                            </TableColumn>
+                        )}
+                    </TableHeader>
+                    <TableBody emptyContent={"No se encontraron ventas"} items={sortedItems}>
+                        {(item) => (
+                            <TableRow key={item.id}>
+                                {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
             </article>
         </section>
     );

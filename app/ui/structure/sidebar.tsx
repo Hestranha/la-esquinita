@@ -90,12 +90,14 @@ export function MultiLevelSidebar() {
                     </ListItem>
                     <AccordionBody className="py-1">
                         <List className="p-0">
-                            <ListItem>
-                                <ListItemPrefix>
-                                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                                </ListItemPrefix>
-                                Ventas
-                            </ListItem>
+                            <Link href="/movimientos/ventas">
+                                <ListItem className={`${pathname.startsWith('/movimientos/ventas') ? 'bg-blue-gray-50 bg-opacity-80 text-blue-gray-900' : ''}`}>
+                                    <ListItemPrefix>
+                                        <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                                    </ListItemPrefix>
+                                    Ventas
+                                </ListItem>
+                            </Link>
                             <Link href="/movimientos/compras">
                                 <ListItem className={`${pathname.startsWith('/movimientos/compras') ? 'bg-blue-gray-50 bg-opacity-80 text-blue-gray-900' : ''}`}>
                                     <ListItemPrefix>
