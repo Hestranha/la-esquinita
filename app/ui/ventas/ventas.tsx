@@ -175,7 +175,7 @@ export default function ContentVentas() {
     return (
         <section className="flex flex-col bg-white rounded-md">
             <header className="bg-pink-500 p-4 rounded-tl-md rounded-tr-md ">
-                <h2 className="text-white font-bold">Registro de ventas</h2>
+                <h2 className="text-white font-bold uppercase">Registro de ventas</h2>
             </header>
             <article className="flex flex-col gap-4 p-4">
                 <section className="flex flex-col lg:flex-row gap-4 lg:items-start">

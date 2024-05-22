@@ -1,10 +1,10 @@
 "use client";
 import React from "react";
 import { Select, SelectItem, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip, Button, DatePicker, getKeyValue } from "@nextui-org/react";
-import { DeleteIcon } from "../components/DeleteIcon";
+import { DeleteIcon } from "../../components/DeleteIcon";
 import { getLocalTimeZone, now } from "@internationalized/date";
 
-export default function ContentCompras() {
+export default function ContentMovimientosVentas() {
     const rows = [
         {
             key: 1,
@@ -38,7 +38,84 @@ export default function ContentCompras() {
                 <span className="text-lg text-danger cursor-pointer active:opacity-50">
                     <DeleteIcon />
                 </span>
-        }
+        },
+        {
+            key: 4,
+            cantidad: 2,
+            producto: "Producto 4",
+            precio_unitario: 20.00,
+            importe: 40.00,
+            eliminar:
+                <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                    <DeleteIcon />
+                </span>
+        },
+        {
+            key: 5,
+            cantidad: 6,
+            producto: "Producto 5",
+            precio_unitario: 12.45,
+            importe: 74.70,
+            eliminar:
+                <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                    <DeleteIcon />
+                </span>
+        },
+        {
+            key: 6,
+            cantidad: 4,
+            producto: "Producto 6",
+            precio_unitario: 9.99,
+            importe: 39.96,
+            eliminar:
+                <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                    <DeleteIcon />
+                </span>
+        },
+        {
+            key: 7,
+            cantidad: 7,
+            producto: "Producto 7",
+            precio_unitario: 18.75,
+            importe: 131.25,
+            eliminar:
+                <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                    <DeleteIcon />
+                </span>
+        },
+        {
+            key: 8,
+            cantidad: 1,
+            producto: "Producto 8",
+            precio_unitario: 25.50,
+            importe: 25.50,
+            eliminar:
+                <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                    <DeleteIcon />
+                </span>
+        },
+        {
+            key: 9,
+            cantidad: 9,
+            producto: "Producto 9",
+            precio_unitario: 11.20,
+            importe: 100.80,
+            eliminar:
+                <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                    <DeleteIcon />
+                </span>
+        },
+        {
+            key: 10,
+            cantidad: 3,
+            producto: "Producto 10",
+            precio_unitario: 14.75,
+            importe: 44.25,
+            eliminar:
+                <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                    <DeleteIcon />
+                </span>
+        },
     ];
 
     const columns = [
@@ -98,7 +175,7 @@ export default function ContentCompras() {
     return (
         <section className="flex flex-col bg-white rounded-md">
             <header className="bg-pink-500 p-4 rounded-tl-md rounded-tr-md ">
-                <h2 className="text-white font-bold uppercase">Registro de compras</h2>
+                <h2 className="text-white font-bold">Registro de ventas</h2>
             </header>
             <article className="flex flex-col gap-4 p-4">
                 <section className="flex flex-col lg:flex-row gap-4 lg:items-start">
@@ -115,12 +192,12 @@ export default function ContentCompras() {
                     </Select>
                     <Input isRequired type="number" size="sm" label="Cantidad" placeholder="Ingresa la cantidad" />
                     <Input
-                        isRequired
+                        isReadOnly
                         type="number"
-                        label="Precio compra"
+                        label="Precio unitario"
+                        color="primary"
                         placeholder="0.00"
                         size="sm"
-                        description="Se actualizará cuando seleccione un producto."
                         endContent={
                             <div className="pointer-events-none flex items-center">
                                 <span className="text-default-400 text-small">S/.</span>
@@ -146,24 +223,44 @@ export default function ContentCompras() {
                     </Table>
                 </section>
                 <section className="flex flex-col xl:grid xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-                    <div className="flex flex-col gap-4 xl:col-span-2">
+                    <div className="flex flex-col gap-4 xl:col-span-2 2xl:col-span-3">
                         <div className="flex flex-col md:flex-row gap-4">
                             <Input
                                 isRequired
                                 type="text"
-                                label="Proveedor"
-                                placeholder="Ingresa el nombre del Proveedor"
+                                label="Cliente"
+                                placeholder="Ingresa el nombre del Cliente"
                             />
+                            <Select
+                                isRequired
+                                label="Método de Entrega"
+                                placeholder="Selecciona el método de entrega"
+                                defaultSelectedKeys={[1]}
+                            >
+                                {metodosEntrega.map((opcion: { value: number, label: string }) => (
+                                    <SelectItem key={opcion.value} value={opcion.value}>{opcion.label}</SelectItem>
+                                ))}
+                            </Select>
+
                         </div>
-                        <div className="flex gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
                             <Input
-                                type="file"
-                                label="Foto de Factura"
-                                placeholder="Suba la foto de la Factura"
+                                isRequired
+                                type="text"
+                                label="Dirección"
+                                className="md:col-span-4"
+                                placeholder="Ingresa la dirección del Cliente"
+                            />
+                            <Input
+                                isRequired
+                                type="number"
+                                label="Celular"
+                                className="md:col-span-3"
+                                placeholder="Ingresa el número del Cliente"
                             />
                         </div>
                     </div>
-                    <div className="flex gap-4 xl:col-span-1 2xl:col-span-2">
+                    <div className="flex flex-col gap-4 xl:col-span-1">
                         <Select
                             isRequired
                             items={metodosPago}
@@ -174,12 +271,20 @@ export default function ContentCompras() {
                                 <SelectItem key={animal.value}>{animal.label}</SelectItem>
                             )}
                         </Select>
-                    </div>
-                    <div className="flex flex-col sm:flex-row xl:flex-col gap-4 xl:col-span-1">
-                        <DatePicker
+                        <Input
                             isRequired
+                            type="number"
+                            label="Celular"
+                            className="md:col-span-3"
+                            placeholder="Ingresa el número del Cliente"
+                        />
+                    </div>
+                    <div className="flex flex-col md:flex-row xl:flex-col gap-4 xl:col-span-1">
+                        <DatePicker
+                            isReadOnly
                             label="Fecha"
                             hideTimeZone
+                            color="primary"
                             showMonthAndYearPickers
                             defaultValue={now(getLocalTimeZone())}
                         />
@@ -199,13 +304,13 @@ export default function ContentCompras() {
                 </section>
                 <section className="flex flex-col lg:flex-row gap-4 justify-end">
                     <Button color="warning" size="lg">
-                        Cancelar Compra
+                        Cancelar Venta
                     </Button>
                     <Button color="secondary" size="lg">
-                        Borrador Compra
+                        Borrador Venta
                     </Button>
                     <Button color="success" size="lg">
-                        Registrar Compra
+                        Registrar Venta
                     </Button>
                 </section>
             </article>

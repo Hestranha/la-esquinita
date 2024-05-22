@@ -78,7 +78,7 @@ export function MultiLevelSidebar() {
                         />
                     }
                 >
-                    <ListItem className="p-0" selected={open === 1}>
+                    <ListItem className={`p-0 ${pathname.startsWith('/movimientos') ? 'bg-blue-gray-50 bg-opacity-80 text-blue-gray-900' : ''}`} selected={open === 1}>
                         <AccordionHeader onClick={() => handleOpen(1)} className="border-b-0 p-3">
                             <ListItemPrefix>
                                 <PresentationChartBarIcon className="h-5 w-5" />
@@ -96,12 +96,14 @@ export function MultiLevelSidebar() {
                                 </ListItemPrefix>
                                 Ventas
                             </ListItem>
-                            <ListItem>
-                                <ListItemPrefix>
-                                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                                </ListItemPrefix>
-                                Compras
-                            </ListItem>
+                            <Link href="/movimientos/compras">
+                                <ListItem className={`${pathname.startsWith('/movimientos/compras') ? 'bg-blue-gray-50 bg-opacity-80 text-blue-gray-900' : ''}`}>
+                                    <ListItemPrefix>
+                                        <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                                    </ListItemPrefix>
+                                    Compras
+                                </ListItem>
+                            </Link>
                         </List>
                     </AccordionBody>
                 </Accordion>
