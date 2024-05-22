@@ -39,7 +39,7 @@ const INITIAL_VISIBLE_COLUMNS = ["id", "name", "role", "status", "actions"];
 
 type User = typeof users[0];
 
-export default function App() {
+export default function ContentVentas() {
     const [filterValue, setFilterValue] = React.useState("");
     const [visibleColumns, setVisibleColumns] = React.useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
     const [statusFilter, setStatusFilter] = React.useState<Selection>("all");

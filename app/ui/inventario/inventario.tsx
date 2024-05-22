@@ -22,12 +22,12 @@ import {
 } from "@nextui-org/react";
 import { columns, users, statusOptions } from "./data";
 import { capitalize } from "./utils";
-import { SearchIcon } from "../../components/SearchIcon";
-import { ChevronDownIcon } from "../../components/ChevronDownIcon";
-import { PlusIcon } from "../../components/PlusIcon";
-import { EyeIcon } from "../../components/EyeIcon";
-import { EditIcon } from "../../components/EditIcon";
-import { DeleteIcon } from "../../components/DeleteIcon";
+import { SearchIcon } from "../components/SearchIcon";
+import { ChevronDownIcon } from "../components/ChevronDownIcon";
+import { PlusIcon } from "../components/PlusIcon";
+import { EyeIcon } from "../components/EyeIcon";
+import { EditIcon } from "../components/EditIcon";
+import { DeleteIcon } from "../components/DeleteIcon";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
     active: "success",
@@ -39,7 +39,7 @@ const INITIAL_VISIBLE_COLUMNS = ["id", "name", "role", "status", "actions"];
 
 type User = typeof users[0];
 
-export default function ContentCompras() {
+export default function ContentInventario() {
     const [filterValue, setFilterValue] = React.useState("");
     const [visibleColumns, setVisibleColumns] = React.useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
     const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
@@ -179,7 +179,7 @@ export default function ContentCompras() {
                     <Input
                         isClearable
                         className="w-full sm:max-w-[44%]"
-                        placeholder="Busca una compra..."
+                        placeholder="Busca un producto..."
                         startContent={<SearchIcon />}
                         value={filterValue}
                         onClear={() => onClear()}
@@ -278,7 +278,7 @@ export default function ContentCompras() {
     return (
         <section className="flex flex-col bg-white rounded-md">
             <header className="bg-pink-50 p-4 rounded-tl-md rounded-tr-md ">
-                <h2 className="text-pink-500 font-bold uppercase">Historial de compras</h2>
+                <h2 className="text-pink-500 font-bold uppercase">Control de Inventario</h2>
             </header>
             <article className="flex flex-col gap-4 p-4">
                 <Table
@@ -305,7 +305,7 @@ export default function ContentCompras() {
                             </TableColumn>
                         )}
                     </TableHeader>
-                    <TableBody emptyContent={"No se encontraron compras"} items={sortedItems}>
+                    <TableBody emptyContent={"No se encontraron productos"} items={sortedItems}>
                         {(item) => (
                             <TableRow key={item.id}>
                                 {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
