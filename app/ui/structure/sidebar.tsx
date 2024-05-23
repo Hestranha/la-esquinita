@@ -16,12 +16,19 @@ import {
     AccordionBody,
 } from "@material-tailwind/react";
 import {
-    PresentationChartBarIcon,
-    ShoppingBagIcon,
-    UserCircleIcon,
-    Cog6ToothIcon,
+    PresentationChartBarIcon, // analisis
+    ShoppingBagIcon, // comprando xd
+    UserCircleIcon, // usuario
+    Cog6ToothIcon, // ajustes
     InboxIcon,
     PowerIcon,
+    BanknotesIcon, // ventas
+    ShoppingCartIcon, // compras
+    ArrowsRightLeftIcon, // movimientos
+    ArchiveBoxIcon, // inventario
+    SquaresPlusIcon, // elementos
+    UserGroupIcon, // colaboradores
+    DocumentChartBarIcon, // reportes
 } from "@heroicons/react/24/solid";
 import { ChevronRightIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
@@ -47,7 +54,7 @@ export function MultiLevelSidebar() {
                 <Link href="/ventas">
                     <ListItem className={`${pathname.startsWith('/ventas') ? 'bg-blue-gray-50 bg-opacity-80 text-blue-gray-900' : ''}`}>
                         <ListItemPrefix>
-                            <UserCircleIcon className="h-5 w-5" />
+                            <BanknotesIcon className="h-5 w-5" />
                         </ListItemPrefix>
                         Ventas
                     </ListItem>
@@ -55,20 +62,11 @@ export function MultiLevelSidebar() {
                 <Link href="/compras">
                     <ListItem className={`${pathname.startsWith('/compras') ? 'bg-blue-gray-50 bg-opacity-80 text-blue-gray-900' : ''}`}>
                         <ListItemPrefix>
-                            <Cog6ToothIcon className="h-5 w-5" />
+                            <ShoppingCartIcon className="h-5 w-5" />
                         </ListItemPrefix>
                         Compras
                     </ListItem>
                 </Link>
-                <ListItem>
-                    <ListItemPrefix>
-                        <InboxIcon className="h-5 w-5" />
-                    </ListItemPrefix>
-                    Pendientes
-                    <ListItemSuffix>
-                        <Chip value="14" size="sm" variant="ghost" color="blue-gray" className="rounded-full" />
-                    </ListItemSuffix>
-                </ListItem>
                 <Accordion
                     open={open === 1}
                     icon={
@@ -81,7 +79,7 @@ export function MultiLevelSidebar() {
                     <ListItem className={`p-0 ${pathname.startsWith('/movimientos') ? 'bg-blue-gray-50 bg-opacity-80 text-blue-gray-900' : ''}`} selected={open === 1}>
                         <AccordionHeader onClick={() => handleOpen(1)} className="border-b-0 p-3">
                             <ListItemPrefix>
-                                <PresentationChartBarIcon className="h-5 w-5" />
+                                <ArrowsRightLeftIcon className="h-5 w-5" />
                             </ListItemPrefix>
                             <Typography color="blue-gray" className="mr-auto font-normal">
                                 Movimientos
@@ -109,12 +107,14 @@ export function MultiLevelSidebar() {
                         </List>
                     </AccordionBody>
                 </Accordion>
-                <ListItem>
-                    <ListItemPrefix>
-                        <PowerIcon className="h-5 w-5" />
-                    </ListItemPrefix>
-                    Inventario
-                </ListItem>
+                <Link href="/inventario">
+                    <ListItem className={`${pathname.startsWith('/inventario') ? 'bg-blue-gray-50 bg-opacity-80 text-blue-gray-900' : ''}`}>
+                        <ListItemPrefix>
+                            <ArchiveBoxIcon className="h-5 w-5" />
+                        </ListItemPrefix>
+                        Inventario
+                    </ListItem>
+                </Link>
                 <Accordion
                     open={open === 2}
                     icon={
@@ -127,7 +127,7 @@ export function MultiLevelSidebar() {
                     <ListItem className="p-0" selected={open === 2}>
                         <AccordionHeader onClick={() => handleOpen(2)} className="border-b-0 p-3">
                             <ListItemPrefix>
-                                <ShoppingBagIcon className="h-5 w-5" />
+                                <SquaresPlusIcon className="h-5 w-5" />
                             </ListItemPrefix>
                             <Typography color="blue-gray" className="mr-auto font-normal">
                                 Elementos
@@ -163,7 +163,49 @@ export function MultiLevelSidebar() {
                     <ListItem className="p-0" selected={open === 3}>
                         <AccordionHeader onClick={() => handleOpen(3)} className="border-b-0 p-3">
                             <ListItemPrefix>
-                                <ShoppingBagIcon className="h-5 w-5" />
+                                <UserGroupIcon className="h-5 w-5" />
+                            </ListItemPrefix>
+                            <Typography color="blue-gray" className="mr-auto font-normal">
+                                Colaboradores
+                            </Typography>
+                        </AccordionHeader>
+                    </ListItem>
+                    <AccordionBody className="py-1">
+                        <List className="p-0">
+                            <ListItem>
+                                <ListItemPrefix>
+                                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                                </ListItemPrefix>
+                                Clientes
+                            </ListItem>
+                            <ListItem>
+                                <ListItemPrefix>
+                                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                                </ListItemPrefix>
+                                Empleados
+                            </ListItem>
+                            <ListItem>
+                                <ListItemPrefix>
+                                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                                </ListItemPrefix>
+                                Proveedores
+                            </ListItem>
+                        </List>
+                    </AccordionBody>
+                </Accordion>
+                <Accordion
+                    open={open === 4}
+                    icon={
+                        <ChevronDownIcon
+                            strokeWidth={2.5}
+                            className={`mx-auto h-4 w-4 transition-transform ${open === 4 ? "rotate-180" : ""}`}
+                        />
+                    }
+                >
+                    <ListItem className="p-0" selected={open === 4}>
+                        <AccordionHeader onClick={() => handleOpen(4)} className="border-b-0 p-3">
+                            <ListItemPrefix>
+                                <DocumentChartBarIcon className="h-5 w-5" />
                             </ListItemPrefix>
                             <Typography color="blue-gray" className="mr-auto font-normal">
                                 Reportes
