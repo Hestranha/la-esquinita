@@ -26,8 +26,6 @@ import { SearchIcon } from "../components/SearchIcon";
 import { ChevronDownIcon } from "../components/ChevronDownIcon";
 import { PlusIcon } from "../components/PlusIcon";
 import { EyeIcon } from "../components/EyeIcon";
-import { EditIcon } from "../components/EditIcon";
-import { DeleteIcon } from "../components/DeleteIcon";
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
     active: "success",
@@ -128,12 +126,6 @@ export default function ContentInventario() {
                         <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                             <EyeIcon />
                         </span>
-                        <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                            <EditIcon />
-                        </span>
-                        <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                            <DeleteIcon />
-                        </span>
                     </div>
                 );
             default:
@@ -228,9 +220,6 @@ export default function ContentInventario() {
                                 ))}
                             </DropdownMenu>
                         </Dropdown>
-                        <Button color="danger" endContent={<PlusIcon size={24} width={24} height={24} />}>
-                            Agregar Nuevo
-                        </Button>
                     </div>
                 </div>
                 <div className="flex justify-between items-center">

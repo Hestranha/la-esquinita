@@ -228,9 +228,6 @@ export default function ContentVentas() {
                                 ))}
                             </DropdownMenu>
                         </Dropdown>
-                        <Button color="danger" endContent={<PlusIcon size={24} width={24} height={24} />}>
-                            Agregar Nuevo
-                        </Button>
                     </div>
                 </div>
                 <div className="flex justify-between items-center">

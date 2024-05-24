@@ -67,6 +67,14 @@ export function MultiLevelSidebar() {
                         Compras
                     </ListItem>
                 </Link>
+                <Link href="/inventario">
+                    <ListItem className={`${pathname.startsWith('/inventario') ? 'bg-blue-gray-50 bg-opacity-80 text-blue-gray-900' : ''}`}>
+                        <ListItemPrefix>
+                            <ArchiveBoxIcon className="h-5 w-5" />
+                        </ListItemPrefix>
+                        Inventario
+                    </ListItem>
+                </Link>
                 <Accordion
                     open={open === 1}
                     icon={
@@ -107,14 +115,6 @@ export function MultiLevelSidebar() {
                         </List>
                     </AccordionBody>
                 </Accordion>
-                <Link href="/inventario">
-                    <ListItem className={`${pathname.startsWith('/inventario') ? 'bg-blue-gray-50 bg-opacity-80 text-blue-gray-900' : ''}`}>
-                        <ListItemPrefix>
-                            <ArchiveBoxIcon className="h-5 w-5" />
-                        </ListItemPrefix>
-                        Inventario
-                    </ListItem>
-                </Link>
                 <Accordion
                     open={open === 2}
                     icon={
@@ -136,18 +136,30 @@ export function MultiLevelSidebar() {
                     </ListItem>
                     <AccordionBody className="py-1">
                         <List className="p-0">
-                            <ListItem>
-                                <ListItemPrefix>
-                                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                                </ListItemPrefix>
-                                Productos
-                            </ListItem>
-                            <ListItem>
-                                <ListItemPrefix>
-                                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                                </ListItemPrefix>
-                                Categorías/Marcas
-                            </ListItem>
+                            <Link href="/elementos/productos">
+                                <ListItem>
+                                    <ListItemPrefix>
+                                        <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                                    </ListItemPrefix>
+                                    Productos
+                                </ListItem>
+                            </Link>
+                            <Link href="/elementos/categorias">
+                                <ListItem>
+                                    <ListItemPrefix>
+                                        <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                                    </ListItemPrefix>
+                                    Categorías
+                                </ListItem>
+                            </Link>
+                            <Link href="/elementos/marcas">
+                                <ListItem>
+                                    <ListItemPrefix>
+                                        <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                                    </ListItemPrefix>
+                                    Marcas
+                                </ListItem>
+                            </Link>
                         </List>
                     </AccordionBody>
                 </Accordion>
