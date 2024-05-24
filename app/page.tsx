@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import { Button, ButtonGroup } from "@nextui-org/button";
+import { Button } from "@nextui-org/button";
 import React from "react";
 
 export default function Page() {
