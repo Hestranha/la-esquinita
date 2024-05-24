@@ -172,7 +172,7 @@ export function MultiLevelSidebar() {
                         />
                     }
                 >
-                    <ListItem className="p-0" selected={open === 3}>
+                    <ListItem className={`p-0 ${pathname.startsWith('/colaboradores') ? 'bg-blue-gray-50 bg-opacity-80 text-blue-gray-900' : ''}`} selected={open === 3}>
                         <AccordionHeader onClick={() => handleOpen(3)} className="border-b-0 p-3">
                             <ListItemPrefix>
                                 <UserGroupIcon className="h-5 w-5" />
@@ -184,24 +184,30 @@ export function MultiLevelSidebar() {
                     </ListItem>
                     <AccordionBody className="py-1">
                         <List className="p-0">
-                            <ListItem>
-                                <ListItemPrefix>
-                                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                                </ListItemPrefix>
-                                Clientes
-                            </ListItem>
-                            <ListItem>
-                                <ListItemPrefix>
-                                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                                </ListItemPrefix>
-                                Empleados
-                            </ListItem>
-                            <ListItem>
-                                <ListItemPrefix>
-                                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                                </ListItemPrefix>
-                                Proveedores
-                            </ListItem>
+                            <Link href="/colaboradores/clientes">
+                                <ListItem className={`${pathname.startsWith('/colaboradores/clientes') ? 'bg-blue-gray-50 bg-opacity-80 text-blue-gray-900' : ''}`}>
+                                    <ListItemPrefix>
+                                        <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                                    </ListItemPrefix>
+                                    Clientes
+                                </ListItem>
+                            </Link>
+                            <Link href="/colaboradores/empleados">
+                                <ListItem className={`${pathname.startsWith('/colaboradores/empleados') ? 'bg-blue-gray-50 bg-opacity-80 text-blue-gray-900' : ''}`}>
+                                    <ListItemPrefix>
+                                        <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                                    </ListItemPrefix>
+                                    Empleados
+                                </ListItem>
+                            </Link>
+                            <Link href="/colaboradores/proveedores">
+                                <ListItem className={`${pathname.startsWith('/colaboradores/proveedores') ? 'bg-blue-gray-50 bg-opacity-80 text-blue-gray-900' : ''}`}>
+                                    <ListItemPrefix>
+                                        <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                                    </ListItemPrefix>
+                                    Proveedores
+                                </ListItem>
+                            </Link>
                         </List>
                     </AccordionBody>
                 </Accordion>
