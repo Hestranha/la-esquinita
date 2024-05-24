@@ -124,7 +124,7 @@ export function MultiLevelSidebar() {
                         />
                     }
                 >
-                    <ListItem className="p-0" selected={open === 2}>
+                    <ListItem className={`p-0 ${pathname.startsWith('/elementos') ? 'bg-blue-gray-50 bg-opacity-80 text-blue-gray-900' : ''}`} selected={open === 2}>
                         <AccordionHeader onClick={() => handleOpen(2)} className="border-b-0 p-3">
                             <ListItemPrefix>
                                 <SquaresPlusIcon className="h-5 w-5" />
@@ -137,7 +137,7 @@ export function MultiLevelSidebar() {
                     <AccordionBody className="py-1">
                         <List className="p-0">
                             <Link href="/elementos/productos">
-                                <ListItem>
+                                <ListItem className={`${pathname.startsWith('/elementos/productos') ? 'bg-blue-gray-50 bg-opacity-80 text-blue-gray-900' : ''}`}>
                                     <ListItemPrefix>
                                         <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                                     </ListItemPrefix>
@@ -145,7 +145,7 @@ export function MultiLevelSidebar() {
                                 </ListItem>
                             </Link>
                             <Link href="/elementos/categorias">
-                                <ListItem>
+                                <ListItem className={`${pathname.startsWith('/elementos/categorias') ? 'bg-blue-gray-50 bg-opacity-80 text-blue-gray-900' : ''}`}>
                                     <ListItemPrefix>
                                         <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                                     </ListItemPrefix>
@@ -153,7 +153,7 @@ export function MultiLevelSidebar() {
                                 </ListItem>
                             </Link>
                             <Link href="/elementos/marcas">
-                                <ListItem>
+                                <ListItem className={`${pathname.startsWith('/elementos/marcas') ? 'bg-blue-gray-50 bg-opacity-80 text-blue-gray-900' : ''}`}>
                                     <ListItemPrefix>
                                         <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                                     </ListItemPrefix>

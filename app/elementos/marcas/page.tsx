@@ -1,7 +1,7 @@
-import ContentMovimientosCompras from "@/app/ui/movimientos/compras/compras";
+import ContentElementosMarcas from "@/app/ui/elementos/marcas/marcas";
 
 export default function Inicio() {
   return (
-    <ContentMovimientosCompras />
+    <ContentElementosMarcas />
   );
 }
