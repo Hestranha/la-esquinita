@@ -46,7 +46,7 @@ export function MultiLevelSidebar() {
             <Link href="/">
                 <div className="mb-2 p-4">
                     <Typography variant="h5" color="blue-gray">
-                        La Esquinita
+                        LibreriAdri
                     </Typography>
                 </div>
             </Link>
@@ -158,6 +158,14 @@ export function MultiLevelSidebar() {
                                         <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                                     </ListItemPrefix>
                                     Marcas
+                                </ListItem>
+                            </Link>
+                            <Link href="/elementos/cargos">
+                                <ListItem className={`${pathname.startsWith('/elementos/cargos') ? 'bg-blue-gray-50 bg-opacity-80 text-blue-gray-900' : ''}`}>
+                                    <ListItemPrefix>
+                                        <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                                    </ListItemPrefix>
+                                    Cargos
                                 </ListItem>
                             </Link>
                         </List>

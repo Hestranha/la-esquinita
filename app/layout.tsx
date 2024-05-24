@@ -9,7 +9,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <title>la esquinita</title>
+      <title>LibreriAdri</title>
       <body className={`${comfortaa.className} antialiased`}>
         <MultiLevelSidebar />
         <NavBar />
