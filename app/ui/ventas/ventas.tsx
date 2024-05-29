@@ -1,31 +1,71 @@
 "use client";
-import React from "react";
-import { Select, SelectItem, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip, Button, DatePicker, getKeyValue, useDisclosure } from "@nextui-org/react";
+import React, { ChangeEvent } from "react";
+import { Input, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip, Button, DatePicker, getKeyValue, Autocomplete, AutocompleteItem } from "@nextui-org/react";
 import { DeleteIcon } from "../components/DeleteIcon";
 import { getLocalTimeZone, now } from "@internationalized/date";
-import BuscarProducto from "./components/buscarProducto";
+import { useInfiniteScroll } from "@nextui-org/use-infinite-scroll";
+import { useBuscarProducto } from "./components/buscarProducto";
+import { useAsyncList } from "@react-stately/data";
+
+type SWCharacter = {
+    name: string;
+    precio_unitario: number;
+};
+
 
 export default function ContentVentas() {
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const [valueCantidad, setValueCantidad] = React.useState("1");
+    const [importe, setImporte] = React.useState("0.00");
+    const [selectedName, setSelectedName] = React.useState("");
+    const [selectedPrecioUnitario, setSelectedPrecioUnitario] = React.useState("0.00");
+
+    React.useEffect(() => {
+        const calcularImporte = (): string => {
+            if (valueCantidad) {
+                const cantidad = Number(valueCantidad);
+                if (cantidad >= 0 && cantidad <= 1000) {
+                    const nuevoImporte = cantidad * parseFloat(selectedPrecioUnitario);
+                    return nuevoImporte.toFixed(2).toString();
+                }
+            }
+            return "0.00";
+        };
+
+        const nuevoImporte = calcularImporte();
+        setImporte(nuevoImporte);
+    }, [valueCantidad, selectedPrecioUnitario]);
+
+    const handleValueCantidadChange = (value: string) => {
+        if (Number(value) >= 0 && Number(value) <= 1000) {
+            console.log(value);
+            setValueCantidad(value);
+        } else {
+            setValueCantidad("");
+        }
+    };
+
+    const handleValueProductoChange = (key: string | number | null) => {
+        const selectedProduct = list.items.find((item) => item.name === key);
+        console.log(list.items);
+        if (selectedProduct) {
+            setSelectedName(selectedProduct.name);
+            setSelectedPrecioUnitario(selectedProduct.precio_unitario.toString());
+            console.log("Selected Name:", selectedProduct.name);
+            console.log("Selected Precio Unitario:", selectedProduct.precio_unitario);
+        }
+    };
+
+    const agregarProducto = () => {
+        console.log("xd");
+    }
 
     const rows = [
         {
             key: 1,
-            cantidad: 5,
             producto: "Producto 1",
+            cantidad: 5,
             precio_unitario: 10.50,
             importe: 52.50,
-            eliminar:
-                <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                    <DeleteIcon />
-                </span>
-        },
-        {
-            key: 2,
-            cantidad: 3,
-            producto: "Producto 2",
-            precio_unitario: 7.25,
-            importe: 21.75,
             eliminar:
                 <span className="text-lg text-danger cursor-pointer active:opacity-50">
                     <DeleteIcon />
@@ -35,12 +75,12 @@ export default function ContentVentas() {
 
     const columns = [
         {
-            key: "cantidad",
-            label: "CANTIDAD",
-        },
-        {
             key: "producto",
             label: "PRODUCTO",
+        },
+        {
+            key: "cantidad",
+            label: "CANTIDAD",
         },
         {
             key: "precio_unitario",
@@ -70,45 +110,99 @@ export default function ContentVentas() {
         { value: 3, label: "Otros" }
     ];
 
+    let list = useAsyncList<SWCharacter>({
+        async load({ signal, filterText }) {
+            let res = await fetch(`/api/ventas/buscarProducto?search=${filterText}`, { signal });
+            let json = await res.json();
+
+            return {
+                items: json.results,
+            };
+        },
+    });
+
     return (
         <React.Fragment>
-            <BuscarProducto isOpen={isOpen} onOpenChange={onOpenChange} />
             <section className="flex flex-col bg-white rounded-md">
                 <header className="bg-pink-500 p-4 rounded-tl-md rounded-tr-md ">
                     <h2 className="text-white font-bold uppercase">Registro de ventas</h2>
                 </header>
                 <article className="flex flex-col gap-4 p-4">
-                    <section className="flex flex-col lg:flex-row gap-4 lg:items-start">
-                        <Input
-                            isRequired
-                            isReadOnly
-                            type="text"
-                            size="sm"
-                            label="Producto"
-                            placeholder="Seleciona un producto"
-                            onClick={onOpen}
-                        />
-                        <Input
-                            isRequired
-                            type="number"
-                            size="sm"
-                            label="Cantidad"
-                            placeholder="Ingresa la cantidad"
-                        />
-                        <Input
-                            isReadOnly
-                            type="number"
-                            label="Precio unitario"
-                            color="primary"
-                            placeholder="0.00"
-                            size="sm"
-                            endContent={
-                                <div className="pointer-events-none flex items-center">
-                                    <span className="text-default-400 text-small">S/.</span>
-                                </div>
-                            }
-                        />
-                        <Button color="danger" size="lg">
+                    <section className="flex flex-col xl:grid xl:grid-cols-7 gap-4">
+                        <div className="xl:col-span-3">
+                            <Autocomplete
+                                isRequired
+                                inputValue={list.filterText}
+                                isLoading={list.isLoading}
+                                items={list.items}
+                                placeholder="Busca un producto"
+                                label="Producto"
+                                size="sm"
+                                onInputChange={(value) => {
+                                    list.setFilterText(value);
+                                    if (value === "") {
+                                        setSelectedName("");
+                                        setSelectedPrecioUnitario("0.00");
+                                    }
+                                }}
+                                onSelectionChange={handleValueProductoChange}
+                            >
+                                {(item) => (
+                                    <AutocompleteItem
+                                        key={item.name}
+                                        textValue={item.name}
+                                    >
+                                        {item.name}
+                                    </AutocompleteItem>
+                                )}
+                            </Autocomplete>
+                        </div>
+                        <div className="flex flex-col xl:grid gap-4 xl:grid-cols-3 xl:col-span-3">
+                            <div className="xl:col-span-1">
+                                <Input
+                                    isRequired
+                                    type="number"
+                                    size="sm"
+                                    label="Cantidad"
+                                    placeholder="Ingresa la cantidad"
+                                    value={valueCantidad}
+                                    onValueChange={handleValueCantidadChange}
+                                />
+                            </div>
+                            <div className="flex flex-row gap-4 xl:grid xl:grid-cols-2 xl:col-span-2">
+                                <Input
+                                    isReadOnly
+                                    type="text"
+                                    label="Precio unitario"
+                                    color="primary"
+                                    placeholder="0.00"
+                                    size="sm"
+                                    className="xl:col-span-1"
+                                    value={selectedPrecioUnitario.toString()}
+                                    endContent={
+                                        <div className="pointer-events-none flex items-center">
+                                            <span className="text-default-400 text-small">S/.</span>
+                                        </div>
+                                    }
+                                />
+                                <Input
+                                    isReadOnly
+                                    type="text"
+                                    label="Importe"
+                                    color="secondary"
+                                    placeholder="0.00"
+                                    size="sm"
+                                    className="xl:col-span-1"
+                                    value={importe}
+                                    endContent={
+                                        <div className="pointer-events-none flex items-center">
+                                            <span className="text-default-400 text-small">S/.</span>
+                                        </div>
+                                    }
+                                />
+                            </div>
+                        </div>
+                        <Button color="danger" className="xl:col-span-1" size="lg" onClick={agregarProducto}>
                             Agregar
                         </Button>
                     </section>
