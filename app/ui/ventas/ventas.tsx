@@ -12,12 +12,21 @@ type SWCharacter = {
     precio_unitario: number;
 };
 
+type Producto = {
+    key: number;
+    nombre: string;
+    cantidad: number;
+    precio_unitario: number;
+    importe: number;
+};
 
 export default function ContentVentas() {
     const [valueCantidad, setValueCantidad] = React.useState("1");
     const [importe, setImporte] = React.useState("0.00");
     const [selectedName, setSelectedName] = React.useState("");
     const [selectedPrecioUnitario, setSelectedPrecioUnitario] = React.useState("0.00");
+    const [productosSeleccionados, setProductosSeleccionados] = React.useState<Producto[]>([]);
+    const formRef = React.useRef<HTMLFormElement>(null);
 
     React.useEffect(() => {
         const calcularImporte = (): string => {
@@ -36,8 +45,7 @@ export default function ContentVentas() {
     }, [valueCantidad, selectedPrecioUnitario]);
 
     const handleValueCantidadChange = (value: string) => {
-        if (Number(value) >= 0 && Number(value) <= 1000) {
-            console.log(value);
+        if (Number(value) > 0 && Number(value) <= 1000) {
             setValueCantidad(value);
         } else {
             setValueCantidad("");
@@ -46,32 +54,36 @@ export default function ContentVentas() {
 
     const handleValueProductoChange = (key: string | number | null) => {
         const selectedProduct = list.items.find((item) => item.name === key);
-        console.log(list.items);
         if (selectedProduct) {
             setSelectedName(selectedProduct.name);
             setSelectedPrecioUnitario(selectedProduct.precio_unitario.toString());
-            console.log("Selected Name:", selectedProduct.name);
-            console.log("Selected Precio Unitario:", selectedProduct.precio_unitario);
         }
     };
 
     const agregarProducto = () => {
-        console.log("xd");
-    }
-
-    const rows = [
-        {
-            key: 1,
-            producto: "Producto 1",
-            cantidad: 5,
-            precio_unitario: 10.50,
-            importe: 52.50,
-            eliminar:
-                <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                    <DeleteIcon />
-                </span>
+        if (formRef.current?.reportValidity()) {
+            const nuevoProducto: Producto = {
+                key: productosSeleccionados.length + 1,
+                nombre: selectedName,
+                cantidad: Number(valueCantidad),
+                precio_unitario: parseFloat(selectedPrecioUnitario),
+                importe: parseFloat(importe),
+            };
+            const nuevosProductos = [...productosSeleccionados, nuevoProducto];
+            setProductosSeleccionados(nuevosProductos);
+            list.setFilterText("");
+            setSelectedName("");
+            setSelectedPrecioUnitario("0.00");
+            setImporte("0.00");
         }
-    ];
+    };
+
+    const eliminarProducto = (key: number) => {
+        setProductosSeleccionados(prevProductos => {
+            const nuevoArray = prevProductos.filter(objeto => objeto.key !== key);
+            return nuevoArray;
+        });
+    };
 
     const columns = [
         {
@@ -128,7 +140,7 @@ export default function ContentVentas() {
                     <h2 className="text-white font-bold uppercase">Registro de ventas</h2>
                 </header>
                 <article className="flex flex-col gap-4 p-4">
-                    <section className="flex flex-col xl:grid xl:grid-cols-7 gap-4">
+                    <form ref={formRef} className="flex flex-col xl:grid xl:grid-cols-7 gap-4">
                         <div className="xl:col-span-3">
                             <Autocomplete
                                 isRequired
@@ -202,19 +214,27 @@ export default function ContentVentas() {
                                 />
                             </div>
                         </div>
-                        <Button color="danger" className="xl:col-span-1" size="lg" onClick={agregarProducto}>
+                        <Button color="danger" className="xl:col-span-1 font-bold" size="lg" onClick={agregarProducto}>
                             Agregar
                         </Button>
-                    </section>
+                    </form>
                     <section className="">
-                        <Table aria-label="Example empty table">
+                        <Table aria-label="Tabla de productos a comprar">
                             <TableHeader columns={columns}>
                                 {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
                             </TableHeader>
-                            <TableBody emptyContent={"No se agregó ningún producto."} items={rows}>
-                                {(item) => (
-                                    <TableRow key={item.key}>
-                                        {(columnKey) => <TableCell>{getKeyValue(item, columnKey)}</TableCell>}
+                            <TableBody emptyContent={"No se agregó ningún producto."} items={productosSeleccionados}>
+                                {(itemProducto) => (
+                                    <TableRow key={itemProducto.key}>
+                                        <TableCell>{itemProducto.nombre}</TableCell>
+                                        <TableCell>{itemProducto.cantidad}</TableCell>
+                                        <TableCell>{itemProducto.precio_unitario}</TableCell>
+                                        <TableCell>{itemProducto.importe}</TableCell>
+                                        <TableCell>
+                                            <span className="text-lg text-danger cursor-pointer active:opacity-50" onClick={() => eliminarProducto(itemProducto.key)}>
+                                                <DeleteIcon />
+                                            </span>
+                                        </TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
@@ -225,12 +245,14 @@ export default function ContentVentas() {
                             <div className="flex flex-col md:flex-row gap-4">
                                 <Input
                                     isRequired
+                                    size="sm"
                                     type="text"
                                     label="Cliente"
                                     placeholder="Ingresa el nombre del Cliente"
                                 />
                                 <Select
                                     isRequired
+                                    size="sm"
                                     label="Método de Entrega"
                                     placeholder="Selecciona el método de entrega"
                                     defaultSelectedKeys={[1]}
@@ -245,6 +267,7 @@ export default function ContentVentas() {
                                 <Input
                                     isRequired
                                     type="text"
+                                    size="sm"
                                     label="Dirección"
                                     className="md:col-span-4"
                                     placeholder="Ingresa la dirección del Cliente"
@@ -252,6 +275,7 @@ export default function ContentVentas() {
                                 <Input
                                     isRequired
                                     type="number"
+                                    size="sm"
                                     label="Celular"
                                     className="md:col-span-3"
                                     placeholder="Ingresa el número del Cliente"
@@ -261,6 +285,7 @@ export default function ContentVentas() {
                         <div className="flex flex-col gap-4 xl:col-span-1">
                             <Select
                                 isRequired
+                                size="sm"
                                 items={metodosPago}
                                 label="Método de pago"
                                 placeholder="Selecciona el método pago"
@@ -272,6 +297,7 @@ export default function ContentVentas() {
                             <Input
                                 isRequired
                                 type="number"
+                                size="sm"
                                 label="Celular"
                                 className="md:col-span-3"
                                 placeholder="Ingresa el número del Cliente"
@@ -281,6 +307,7 @@ export default function ContentVentas() {
                             <DatePicker
                                 isReadOnly
                                 label="Fecha"
+                                size="sm"
                                 hideTimeZone
                                 color="primary"
                                 showMonthAndYearPickers
@@ -290,6 +317,7 @@ export default function ContentVentas() {
                                 isReadOnly
                                 type="number"
                                 label="Total"
+                                size="sm"
                                 color="success"
                                 placeholder="0.00"
                                 endContent={
@@ -301,10 +329,10 @@ export default function ContentVentas() {
                         </div>
                     </section>
                     <section className="flex flex-col lg:flex-row gap-4 justify-end">
-                        <Button color="warning" size="lg">
+                        <Button className="font-bold" color="warning" size="lg">
                             Cancelar Venta
                         </Button>
-                        <Button color="success" size="lg">
+                        <Button className="font-bold" color="success" size="lg">
                             Registrar Venta
                         </Button>
                     </section>
