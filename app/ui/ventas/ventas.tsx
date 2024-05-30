@@ -37,11 +37,18 @@ type Venta = {
 }
 
 export default function ContentVentas() {
+    const longitudCliente = 80;
+    const longitudCelular = 15;
+    const longitudDireccion = 100;
+
     const [metodosPago, setMetodosPago] = React.useState([]);
     const metodosEntrega = [
         { value: 1, label: "En Tienda" },
         { value: 2, label: "Envío" }
     ];
+
+    const [validName, setValidName] = React.useState(false);
+    const [validCantidad, setValidCantidad] = React.useState(false);
 
     const [idProducto, setSelectedIdProducto] = React.useState<number | null>(null);
     const [selectedName, setSelectedName] = React.useState("");
@@ -49,15 +56,19 @@ export default function ContentVentas() {
     const [selectedPrecioUnitario, setSelectedPrecioUnitario] = React.useState("0.00");
     const [importe, setImporte] = React.useState("0.00");
 
-    const [validName, setValidName] = React.useState(false);
-    const [validCantidad, setValidCantidad] = React.useState(false);
 
     const [showDireccionCelular, setShowDireccionCelular] = React.useState(false);
     const [showCelular, setShowCelular] = React.useState(false);
 
+    const [validCliente, setValidCliente] = React.useState(false);
+    const regexCliente = /^[a-zA-Z\s]*$/;
+    const [validMetodoEntrega, setValidMetodoEntrega] = React.useState(false);
+    const [validDireccion, setValidDireccion] = React.useState(false);
+    const [validCelular, setValidCelular] = React.useState(false);
+
     const [valueCliente, setValueCliente] = React.useState("");
-    const [valueCelular, setValueCelular] = React.useState<number | null>(null);
     const [valueDireccion, setValueDireccion] = React.useState("");
+    const [valueCelular, setValueCelular] = React.useState("");
     const [valueMetodoPago, setValueMetodoPago] = React.useState(1);
     const [valueMetodoEntrega, setValueMetodoEntrega] = React.useState(1);
     const [ventaTotal, setVentaTotal] = React.useState("0.00");
@@ -94,8 +105,27 @@ export default function ContentVentas() {
         if (Number(value) > 0 && Number(value) <= 1000) {
             setValueCantidad(value);
             setValidCantidad(false);
-        } else {
-            setValueCantidad("");
+        }
+    };
+
+    const handleValueCliente = (value: string) => {
+        if (regexCliente.test(value) && value.length <= longitudCliente) {
+            setValueCliente(value);
+            setValidCliente(false);
+        }
+    };
+
+    const handleValueDireccion = (value: string) => {
+        if (value.length <= longitudDireccion) {
+            setValueDireccion(value);
+            setValidDireccion(false);
+        }
+    };
+
+    const handleValueCelular = (value: string) => {
+        if (value.length <= longitudCelular) {
+            setValueCelular(value);
+            setValidCelular(false);
         }
     };
 
@@ -142,10 +172,36 @@ export default function ContentVentas() {
 
     const [open, setOpen] = React.useState(false);
     const agregarVenta = () => {
+        if (valueCliente === "") {
+            setValidCliente(true);
+            return;
+        }
+        if (valueMetodoEntrega === 0) {
+            setValidMetodoEntrega(true);
+            return;
+        }
+        if (valueMetodoEntrega === 2) {
+            if (valueDireccion === "") {
+                setValidDireccion(true);
+                return;
+            }
+            if (!Number(valueCelular)) {
+                setValidCelular(true);
+                return;
+            }
+        }
+        if (valueMetodoEntrega !== 1 && valueMetodoPago === 1) {
+            if (!Number(valueCelular)) {
+                setValidCelular(true);
+                return;
+            }
+        }
+
         if (productosSeleccionados.length === 0) {
             setOpen(true);
             return;
         }
+
         const fechaActual = now(getLocalTimeZone());
         const nuevaVenta: Venta = {
             cliente: valueCliente,
@@ -159,7 +215,6 @@ export default function ContentVentas() {
             productos: productosSeleccionados,
         };
         console.log(nuevaVenta);
-        return;
     }
 
     const columns = [
@@ -240,7 +295,7 @@ export default function ContentVentas() {
                         </IconButton>
                     }
                 >
-                    Agrega al menos un producto para poder registrar la venta.
+                    Debe agregar al menos un producto para poder registrar la venta.
                 </Alert>
             </Grow>
             <section className="flex flex-col bg-white rounded-md">
@@ -253,7 +308,7 @@ export default function ContentVentas() {
                             <Autocomplete
                                 isRequired
                                 isInvalid={validName}
-                                errorMessage="Selecciona un producto válido"
+                                errorMessage="Debe seleccionar un producto"
                                 inputValue={list.filterText}
                                 isLoading={list.isLoading}
                                 items={list.items}
@@ -285,7 +340,7 @@ export default function ContentVentas() {
                                 <Input
                                     isRequired
                                     isInvalid={validCantidad}
-                                    errorMessage="Ingresa una cantidad válida"
+                                    errorMessage="Debe ingresar una cantidad"
                                     type="number"
                                     size="sm"
                                     label="Cantidad"
@@ -358,21 +413,25 @@ export default function ContentVentas() {
                     </section>
                     <form className="flex flex-col gap-4" >
                         <div className="flex flex-col xl:grid xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-                            <div className="flex flex-col gap-4 xl:col-span-2 2xl:col-span-3">
+                            <div className="flex flex-col gap-2 xl:col-span-2 2xl:col-span-3">
                                 <div className="flex flex-col md:flex-row gap-4">
                                     <Input
                                         isRequired
                                         size="sm"
                                         type="text"
+                                        isInvalid={validCliente}
+                                        errorMessage="Debe ingresar el nombre del cliente"
                                         label="Cliente"
                                         placeholder="Ingresa el nombre del Cliente"
                                         value={valueCliente}
-                                        onValueChange={setValueCliente}
+                                        onValueChange={handleValueCliente}
                                     />
                                     <Select
                                         isRequired
                                         size="sm"
                                         label="Método de Entrega"
+                                        isInvalid={validMetodoEntrega}
+                                        errorMessage="Debe seleccionar un método de entrega"
                                         placeholder="Selecciona el método de entrega"
                                         defaultSelectedKeys={["1"]}
                                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -383,6 +442,7 @@ export default function ContentVentas() {
                                                 setShowDireccionCelular(false);
                                             }
                                             setValueMetodoEntrega(Number(value));
+                                            setValidMetodoEntrega(false);
                                         }}
                                     >
                                         {metodosEntrega.map((opcion: { value: number, label: string }) => (
@@ -399,6 +459,10 @@ export default function ContentVentas() {
                                             size="sm"
                                             label="Dirección"
                                             className="md:col-span-4"
+                                            isInvalid={validDireccion}
+                                            errorMessage="Debe ingresar una dirección"
+                                            value={valueDireccion}
+                                            onValueChange={handleValueDireccion}
                                             placeholder="Ingresa la dirección del Cliente"
                                         />
                                         <Input
@@ -407,7 +471,11 @@ export default function ContentVentas() {
                                             size="sm"
                                             label="Celular"
                                             className="md:col-span-3"
-                                            placeholder="Ingresa el número del Cliente"
+                                            isInvalid={validCelular}
+                                            errorMessage="Debe ingresar un número celular"
+                                            value={valueCelular}
+                                            onValueChange={handleValueCelular}
+                                            placeholder="Ingresa el número celular del Cliente"
                                         />
                                     </div>
                                 )}
@@ -443,8 +511,12 @@ export default function ContentVentas() {
                                         type="number"
                                         size="sm"
                                         label="Celular"
+                                        isInvalid={validCelular}
+                                        errorMessage="Debe ingresar un número celular"
+                                        value={valueCelular}
+                                        onValueChange={handleValueCelular}
                                         className="md:col-span-3"
-                                        placeholder="Ingresa el número del Cliente"
+                                        placeholder="Ingresa el número celular del Cliente"
                                     />
                                 )}
                             </div>
