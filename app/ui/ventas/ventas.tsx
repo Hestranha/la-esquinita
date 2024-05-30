@@ -1,5 +1,5 @@
 "use client";
-import React, { ChangeEvent } from "react";
+import React from "react";
 import { Input, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip, Button, DatePicker, getKeyValue, Autocomplete, AutocompleteItem } from "@nextui-org/react";
 import { DeleteIcon } from "../components/DeleteIcon";
 import { getLocalTimeZone, now } from "@internationalized/date";
@@ -34,6 +34,12 @@ type Venta = {
 }
 
 export default function ContentVentas() {
+    const [metodosPago, setMetodosPago] = React.useState([]);
+    const metodosEntrega = [
+        { value: 1, label: "En Tienda" },
+        { value: 2, label: "Envío" }
+    ];
+
     const [idProducto, setSelectedIdProducto] = React.useState<number | null>(null);
     const [selectedName, setSelectedName] = React.useState("");
     const [valueCantidad, setValueCantidad] = React.useState("1");
@@ -124,7 +130,11 @@ export default function ContentVentas() {
         });
     };
 
+    const [open, setOpen] = React.useState(true);
     const agregarVenta = () => {
+        if (productosSeleccionados.length == 0) {
+            setOpen(true)
+        }
         if (formAgregarVentaRef.current?.reportValidity()) {
             const fechaActual = now(getLocalTimeZone());
             const nuevaVenta: Venta = {
@@ -167,10 +177,11 @@ export default function ContentVentas() {
                 </span>,
         }
     ];
-    const [metodosPago, setMetodosPago] = React.useState([]);
+
     React.useEffect(() => {
         fetchMetodosPago();
     }, []);
+
     const fetchMetodosPago = async () => {
         try {
             const response = await fetch("/api/ventas/metodosPago", {
@@ -188,16 +199,6 @@ export default function ContentVentas() {
             console.error("Error al obtener los métodos de pago:", error);
         }
     };
-
-    // const metodosPago = [
-    //     { value: 1, label: "Efectivo" },
-    //     { value: 2, label: "Yape" },
-    //     { value: 3, label: "Otros" }
-    // ];
-    const metodosEntrega = [
-        { value: 1, label: "En Tienda" },
-        { value: 2, label: "Envío" }
-    ];
 
     let list = useAsyncList<SWCharacter>({
         async load({ signal, filterText }) {
