@@ -8,6 +8,7 @@ import { useBuscarProducto } from "./components/buscarProducto";
 import { useAsyncList } from "@react-stately/data";
 
 type SWCharacter = {
+    id_producto: number;
     name: string;
     precio_unitario: number;
 };
@@ -21,12 +22,18 @@ type Producto = {
 };
 
 export default function ContentVentas() {
-    const [valueCantidad, setValueCantidad] = React.useState("1");
-    const [importe, setImporte] = React.useState("0.00");
+    const [idProducto, setSelectedIdProducto] = React.useState<number | null>(null)
     const [selectedName, setSelectedName] = React.useState("");
+    const [valueCantidad, setValueCantidad] = React.useState("1");
     const [selectedPrecioUnitario, setSelectedPrecioUnitario] = React.useState("0.00");
+    const [importe, setImporte] = React.useState("0.00");
+
+    const [showDireccionCelular, setShowDireccionCelular] = React.useState(false);
+    const [showCelular, setShowCelular] = React.useState(false);
+    const formAgregarProductoRef = React.useRef<HTMLFormElement>(null);
+
     const [productosSeleccionados, setProductosSeleccionados] = React.useState<Producto[]>([]);
-    const formRef = React.useRef<HTMLFormElement>(null);
+    const [ventaTotal, setVentaTotal] = React.useState("0.00");
 
     React.useEffect(() => {
         const calcularImporte = (): string => {
@@ -44,26 +51,36 @@ export default function ContentVentas() {
         setImporte(nuevoImporte);
     }, [valueCantidad, selectedPrecioUnitario]);
 
+    React.useEffect(() => {
+        let suma = 0;
+        productosSeleccionados.forEach(producto => {
+            suma += producto.importe;
+        });
+        setVentaTotal(suma.toFixed(2).toString());
+    }, [productosSeleccionados]);
+
+
     const handleValueCantidadChange = (value: string) => {
         if (Number(value) > 0 && Number(value) <= 1000) {
             setValueCantidad(value);
         } else {
-            setValueCantidad("");
+            setValueCantidad("1");
         }
     };
 
     const handleValueProductoChange = (key: string | number | null) => {
         const selectedProduct = list.items.find((item) => item.name === key);
         if (selectedProduct) {
+            setSelectedIdProducto(selectedProduct.id_producto);
             setSelectedName(selectedProduct.name);
             setSelectedPrecioUnitario(selectedProduct.precio_unitario.toString());
         }
     };
 
     const agregarProducto = () => {
-        if (formRef.current?.reportValidity()) {
+        if (formAgregarProductoRef.current?.reportValidity()) {
             const nuevoProducto: Producto = {
-                key: productosSeleccionados.length + 1,
+                key: idProducto || 0,
                 nombre: selectedName,
                 cantidad: Number(valueCantidad),
                 precio_unitario: parseFloat(selectedPrecioUnitario),
@@ -140,7 +157,7 @@ export default function ContentVentas() {
                     <h2 className="text-white font-bold uppercase">Registro de ventas</h2>
                 </header>
                 <article className="flex flex-col gap-4 p-4">
-                    <form ref={formRef} className="flex flex-col xl:grid xl:grid-cols-7 gap-4">
+                    <form ref={formAgregarProductoRef} className="flex flex-col xl:grid xl:grid-cols-7 gap-4">
                         <div className="xl:col-span-3">
                             <Autocomplete
                                 isRequired
@@ -255,7 +272,15 @@ export default function ContentVentas() {
                                     size="sm"
                                     label="Método de Entrega"
                                     placeholder="Selecciona el método de entrega"
-                                    defaultSelectedKeys={[1]}
+                                    defaultSelectedKeys={["1"]}
+                                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                        const value = e.target.value;
+                                        if (value === "2") {
+                                            setShowDireccionCelular(true);
+                                        } else {
+                                            setShowDireccionCelular(false);
+                                        }
+                                    }}
                                 >
                                     {metodosEntrega.map((opcion: { value: number, label: string }) => (
                                         <SelectItem key={opcion.value} value={opcion.value}>{opcion.label}</SelectItem>
@@ -263,24 +288,26 @@ export default function ContentVentas() {
                                 </Select>
 
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
-                                <Input
-                                    isRequired
-                                    type="text"
-                                    size="sm"
-                                    label="Dirección"
-                                    className="md:col-span-4"
-                                    placeholder="Ingresa la dirección del Cliente"
-                                />
-                                <Input
-                                    isRequired
-                                    type="number"
-                                    size="sm"
-                                    label="Celular"
-                                    className="md:col-span-3"
-                                    placeholder="Ingresa el número del Cliente"
-                                />
-                            </div>
+                            {showDireccionCelular && (
+                                <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
+                                    <Input
+                                        isRequired
+                                        type="text"
+                                        size="sm"
+                                        label="Dirección"
+                                        className="md:col-span-4"
+                                        placeholder="Ingresa la dirección del Cliente"
+                                    />
+                                    <Input
+                                        isRequired
+                                        type="number"
+                                        size="sm"
+                                        label="Celular"
+                                        className="md:col-span-3"
+                                        placeholder="Ingresa el número del Cliente"
+                                    />
+                                </div>
+                            )}
                         </div>
                         <div className="flex flex-col gap-4 xl:col-span-1">
                             <Select
@@ -289,19 +316,30 @@ export default function ContentVentas() {
                                 items={metodosPago}
                                 label="Método de pago"
                                 placeholder="Selecciona el método pago"
+                                defaultSelectedKeys={["1"]}
+                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                    const value = e.target.value;
+                                    if (value === "2") {
+                                        setShowCelular(true);
+                                    } else {
+                                        setShowCelular(false);
+                                    }
+                                }}
                             >
                                 {(animal: { value: number, label: string }) => (
                                     <SelectItem key={animal.value}>{animal.label}</SelectItem>
                                 )}
                             </Select>
-                            <Input
-                                isRequired
-                                type="number"
-                                size="sm"
-                                label="Celular"
-                                className="md:col-span-3"
-                                placeholder="Ingresa el número del Cliente"
-                            />
+                            {(showDireccionCelular == false && showCelular) && (
+                                <Input
+                                    isRequired
+                                    type="number"
+                                    size="sm"
+                                    label="Celular"
+                                    className="md:col-span-3"
+                                    placeholder="Ingresa el número del Cliente"
+                                />
+                            )}
                         </div>
                         <div className="flex flex-col md:flex-row xl:flex-col gap-4 xl:col-span-1">
                             <DatePicker
@@ -315,11 +353,12 @@ export default function ContentVentas() {
                             />
                             <Input
                                 isReadOnly
-                                type="number"
+                                type="text"
                                 label="Total"
                                 size="sm"
                                 color="success"
                                 placeholder="0.00"
+                                value={ventaTotal}
                                 endContent={
                                     <div className="pointer-events-none flex items-center">
                                         <span className="text-default-400 text-small">S/.</span>
