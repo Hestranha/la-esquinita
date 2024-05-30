@@ -7,6 +7,11 @@ import { useInfiniteScroll } from "@nextui-org/use-infinite-scroll";
 import { useBuscarProducto } from "./components/buscarProducto";
 import { useAsyncList } from "@react-stately/data";
 
+import Alert from '@mui/material/Alert';
+import Grow from "@mui/material/Grow";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+
 type SWCharacter = {
     id_producto: number;
     name: string;
@@ -130,12 +135,13 @@ export default function ContentVentas() {
         });
     };
 
-    const [open, setOpen] = React.useState(true);
+    const [open, setOpen] = React.useState(false);
     const agregarVenta = () => {
-        if (productosSeleccionados.length == 0) {
-            setOpen(true)
-        }
         if (formAgregarVentaRef.current?.reportValidity()) {
+            if (productosSeleccionados.length === 0) {
+                setOpen(true);
+                return;
+            }
             const fechaActual = now(getLocalTimeZone());
             const nuevaVenta: Venta = {
                 cliente: valueCliente,
@@ -149,6 +155,7 @@ export default function ContentVentas() {
                 productos: productosSeleccionados,
             };
             console.log(nuevaVenta);
+            return;
         }
     }
 
@@ -213,6 +220,26 @@ export default function ContentVentas() {
 
     return (
         <React.Fragment>
+            <Grow in={open} className="absolute m-4 bottom-0 left-0 z-50">
+                <Alert
+                    severity="error"
+                    variant="filled"
+                    action={
+                        <IconButton
+                            aria-label="close"
+                            color="inherit"
+                            size="small"
+                            onClick={() => {
+                                setOpen(false);
+                            }}
+                        >
+                            <CloseIcon fontSize="inherit" />
+                        </IconButton>
+                    }
+                >
+                    Por favor, agrega al menos un producto para poder registrar la venta.
+                </Alert>
+            </Grow>
             <section className="flex flex-col bg-white rounded-md">
                 <header className="bg-pink-500 p-4 rounded-tl-md rounded-tr-md ">
                     <h2 className="text-white font-bold uppercase">Registro de ventas</h2>
@@ -336,7 +363,7 @@ export default function ContentVentas() {
                                         size="sm"
                                         label="Método de Entrega"
                                         placeholder="Selecciona el método de entrega"
-                                        defaultSelectedKeys={["1"]}
+                                        defaultSelectedKeys={valueMetodoEntrega ? ["1"] : [""]}
                                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                                             const value = Number(e.target.value);
                                             const selectedMetodoPago = metodosPago.find((metodo) => (metodo as any).value === value);
@@ -384,7 +411,7 @@ export default function ContentVentas() {
                                     items={metodosPago}
                                     label="Método de pago"
                                     placeholder="Selecciona el método pago"
-                                    defaultSelectedKeys={["1"]}
+                                    defaultSelectedKeys={valueMetodoPago ? ["1"] : [""]}
                                     onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                                         const value = e.target.value;
                                         if (value === "6") {
