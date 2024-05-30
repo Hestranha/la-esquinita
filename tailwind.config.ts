@@ -1,4 +1,4 @@
-import { nextui } from '@nextui-org/theme';
+import { nextui } from '@nextui-org/react';
 import type { Config } from 'tailwindcss';
 import withMT from '@material-tailwind/react/utils/withMT';
 

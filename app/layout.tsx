@@ -2,6 +2,8 @@ import { comfortaa } from "./ui/fonts";
 import "./ui/global.css"
 import { NavBar } from "./ui/structure/navbar";
 import { MultiLevelSidebar } from "./ui/structure/sidebar";
+import { NextUIProvider } from "@nextui-org/react";
+
 export default function RootLayout({
   children,
 }: {
@@ -11,9 +13,11 @@ export default function RootLayout({
     <html lang="en">
       <title>LibreriAdri</title>
       <body className={`${comfortaa.className} antialiased`}>
-        <MultiLevelSidebar />
-        <NavBar />
-        {children}
+        <NextUIProvider>
+          <MultiLevelSidebar />
+          <NavBar />
+          {children}
+        </NextUIProvider>
       </body>
     </html>
   );

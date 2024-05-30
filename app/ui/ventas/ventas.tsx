@@ -3,14 +3,7 @@ import React from "react";
 import { Input, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip, Button, DatePicker, getKeyValue, Autocomplete, AutocompleteItem } from "@nextui-org/react";
 import { DeleteIcon } from "../components/DeleteIcon";
 import { getLocalTimeZone, now } from "@internationalized/date";
-import { useInfiniteScroll } from "@nextui-org/use-infinite-scroll";
-import { useBuscarProducto } from "./components/buscarProducto";
 import { useAsyncList } from "@react-stately/data";
-
-import Alert from '@mui/material/Alert';
-import Grow from "@mui/material/Grow";
-import IconButton from "@mui/material/IconButton";
-import CloseIcon from "@mui/icons-material/Close";
 
 type SWCharacter = {
     id_producto: number;
@@ -39,6 +32,8 @@ type Venta = {
 }
 
 export default function ContentVentas() {
+    const formAgregarProductoRef = React.useRef<HTMLFormElement>(null);
+    const formAgregarVentaRef = React.useRef<HTMLFormElement>(null);
     const [metodosPago, setMetodosPago] = React.useState([]);
     const metodosEntrega = [
         { value: 1, label: "En Tienda" },
@@ -53,7 +48,6 @@ export default function ContentVentas() {
 
     const [showDireccionCelular, setShowDireccionCelular] = React.useState(false);
     const [showCelular, setShowCelular] = React.useState(false);
-    const formAgregarProductoRef = React.useRef<HTMLFormElement>(null);
 
     const [valueCliente, setValueCliente] = React.useState("");
     const [valueCelular, setValueCelular] = React.useState<number | null>(null);
@@ -63,10 +57,7 @@ export default function ContentVentas() {
     const [ventaTotal, setVentaTotal] = React.useState("0.00");
     const [productosSeleccionados, setProductosSeleccionados] = React.useState<Producto[]>([]);
 
-
-
     const [venta, setVenta] = React.useState<Venta[]>([]);
-    const formAgregarVentaRef = React.useRef<HTMLFormElement>(null);
 
     React.useEffect(() => {
         const calcularImporte = (): string => {
@@ -111,6 +102,29 @@ export default function ContentVentas() {
     };
 
     const agregarProducto = () => {
+        console.log("Verificando la validez del formulario...");
+        console.log("Nombre seleccionado:", selectedName);
+        console.log("Cantidad:", valueCantidad);
+        console.log("Precio unitario seleccionado:", selectedPrecioUnitario);
+        console.log("Estado formulario:", formAgregarProductoRef.current?.reportValidity());
+        console.log("Estado formulario:", formAgregarProductoRef.current?.checkValidity());
+        const form = formAgregarProductoRef.current;
+        if (form) {
+            console.log("Validando campos individualmente...");
+            for (let i = 0; i < form.elements.length; i++) {
+                const element = form.elements[i] as HTMLInputElement;
+                if (element.tagName !== "BUTTON") {
+                    if (element.required && element.value.trim() === "") {
+                        console.log(`Campo '${element.name || "Unnamed"}' está vacío.`);
+                    }
+                }
+            }
+
+            console.log("Validando formulario en conjunto...");
+            console.log("Estado formulario:", form.reportValidity());
+        }
+
+
         if (formAgregarProductoRef.current?.reportValidity()) {
             const nuevoProducto: Producto = {
                 key: idProducto || 0,
@@ -220,32 +234,12 @@ export default function ContentVentas() {
 
     return (
         <React.Fragment>
-            <Grow in={open} className="absolute m-4 bottom-0 left-0 z-50">
-                <Alert
-                    severity="error"
-                    variant="filled"
-                    action={
-                        <IconButton
-                            aria-label="close"
-                            color="inherit"
-                            size="small"
-                            onClick={() => {
-                                setOpen(false);
-                            }}
-                        >
-                            <CloseIcon fontSize="inherit" />
-                        </IconButton>
-                    }
-                >
-                    Por favor, agrega al menos un producto para poder registrar la venta.
-                </Alert>
-            </Grow>
             <section className="flex flex-col bg-white rounded-md">
                 <header className="bg-pink-500 p-4 rounded-tl-md rounded-tr-md ">
                     <h2 className="text-white font-bold uppercase">Registro de ventas</h2>
                 </header>
                 <article className="flex flex-col gap-4 p-4">
-                    <form ref={formAgregarProductoRef} className="flex flex-col xl:grid xl:grid-cols-7 gap-4">
+                    <form id="formAgregarProducto" ref={formAgregarProductoRef} className="flex flex-col xl:grid xl:grid-cols-7 gap-4">
                         <div className="xl:col-span-3">
                             <Autocomplete
                                 isRequired
@@ -253,6 +247,7 @@ export default function ContentVentas() {
                                 isLoading={list.isLoading}
                                 items={list.items}
                                 placeholder="Busca un producto"
+                                name="producto"
                                 label="Producto"
                                 size="sm"
                                 onInputChange={(value) => {
@@ -281,6 +276,7 @@ export default function ContentVentas() {
                                     type="number"
                                     size="sm"
                                     label="Cantidad"
+                                    name="cantidad"
                                     placeholder="Ingresa la cantidad"
                                     value={valueCantidad}
                                     onValueChange={handleValueCantidadChange}
@@ -293,6 +289,7 @@ export default function ContentVentas() {
                                     label="Precio unitario"
                                     color="primary"
                                     placeholder="0.00"
+                                    name="precio_unitario"
                                     size="sm"
                                     className="xl:col-span-1"
                                     value={selectedPrecioUnitario.toString()}
@@ -307,6 +304,7 @@ export default function ContentVentas() {
                                     type="text"
                                     label="Importe"
                                     color="secondary"
+                                    name="importe"
                                     placeholder="0.00"
                                     size="sm"
                                     className="xl:col-span-1"
@@ -363,18 +361,15 @@ export default function ContentVentas() {
                                         size="sm"
                                         label="Método de Entrega"
                                         placeholder="Selecciona el método de entrega"
-                                        defaultSelectedKeys={valueMetodoEntrega ? ["1"] : [""]}
+                                        defaultSelectedKeys={["1"]}
                                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                                            const value = Number(e.target.value);
-                                            const selectedMetodoPago = metodosPago.find((metodo) => (metodo as any).value === value);
-                                            if (selectedMetodoPago) {
-                                                if ((selectedMetodoPago as any).label === "Yape") {
-                                                    setShowCelular(true);
-                                                } else {
-                                                    setShowCelular(false);
-                                                }
-                                                setValueMetodoPago((selectedMetodoPago as any).value);
+                                            const value = e.target.value;
+                                            if (value === "2") {
+                                                setShowDireccionCelular(true);
+                                            } else {
+                                                setShowDireccionCelular(false);
                                             }
+                                            setValueMetodoEntrega(Number(value));
                                         }}
                                     >
                                         {metodosEntrega.map((opcion: { value: number, label: string }) => (
@@ -411,15 +406,18 @@ export default function ContentVentas() {
                                     items={metodosPago}
                                     label="Método de pago"
                                     placeholder="Selecciona el método pago"
-                                    defaultSelectedKeys={valueMetodoPago ? ["1"] : [""]}
+                                    defaultSelectedKeys={["1"]}
                                     onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                                        const value = e.target.value;
-                                        if (value === "6") {
-                                            setShowCelular(true);
-                                        } else {
-                                            setShowCelular(false);
+                                        const value = Number(e.target.value);
+                                        const selectedMetodoPago = metodosPago.find((metodo) => (metodo as any).value === value);
+                                        if (selectedMetodoPago) {
+                                            if ((selectedMetodoPago as any).label === "Yape") {
+                                                setShowCelular(true);
+                                            } else {
+                                                setShowCelular(false);
+                                            }
+                                            setValueMetodoEntrega((selectedMetodoPago as any).value);
                                         }
-                                        setValueMetodoPago(Number(value));
                                     }}
                                 >
                                     {(animal: { value: number, label: string }) => (
