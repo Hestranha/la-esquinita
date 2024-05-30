@@ -5,6 +5,11 @@ import { DeleteIcon } from "../components/DeleteIcon";
 import { getLocalTimeZone, now } from "@internationalized/date";
 import { useAsyncList } from "@react-stately/data";
 
+import Alert from '@mui/material/Alert';
+import Grow from "@mui/material/Grow";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+
 type SWCharacter = {
     id_producto: number;
     name: string;
@@ -218,6 +223,26 @@ export default function ContentVentas() {
 
     return (
         <React.Fragment>
+            <Grow in={open} className="absolute m-4 bottom-0 left-0 z-50">
+                <Alert
+                    severity="error"
+                    variant="filled"
+                    action={
+                        <IconButton
+                            aria-label="close"
+                            color="inherit"
+                            size="small"
+                            onClick={() => {
+                                setOpen(false);
+                            }}
+                        >
+                            <CloseIcon fontSize="inherit" />
+                        </IconButton>
+                    }
+                >
+                    Agrega al menos un producto para poder registrar la venta.
+                </Alert>
+            </Grow>
             <section className="flex flex-col bg-white rounded-md">
                 <header className="bg-pink-500 p-4 rounded-tl-md rounded-tr-md ">
                     <h2 className="text-white font-bold uppercase">Registro de ventas</h2>
