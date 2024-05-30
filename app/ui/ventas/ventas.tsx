@@ -21,8 +21,20 @@ type Producto = {
     importe: number;
 };
 
+type Venta = {
+    cliente: string;
+    celular_cliente?: string;
+    direccion_cliente?: string;
+    fecha_registro: Date;
+    metodo_pago: number;
+    fecha_boleta: Date;
+    metodo_entrega: number;
+    total_venta: number;
+    productos: Producto[];
+}
+
 export default function ContentVentas() {
-    const [idProducto, setSelectedIdProducto] = React.useState<number | null>(null)
+    const [idProducto, setSelectedIdProducto] = React.useState<number | null>(null);
     const [selectedName, setSelectedName] = React.useState("");
     const [valueCantidad, setValueCantidad] = React.useState("1");
     const [selectedPrecioUnitario, setSelectedPrecioUnitario] = React.useState("0.00");
@@ -32,8 +44,18 @@ export default function ContentVentas() {
     const [showCelular, setShowCelular] = React.useState(false);
     const formAgregarProductoRef = React.useRef<HTMLFormElement>(null);
 
-    const [productosSeleccionados, setProductosSeleccionados] = React.useState<Producto[]>([]);
+    const [valueCliente, setValueCliente] = React.useState("");
+    const [valueCelular, setValueCelular] = React.useState<number | null>(null);
+    const [valueDireccion, setValueDireccion] = React.useState("");
+    const [valueMetodoPago, setValueMetodoPago] = React.useState(1);
+    const [valueMetodoEntrega, setValueMetodoEntrega] = React.useState(1);
     const [ventaTotal, setVentaTotal] = React.useState("0.00");
+    const [productosSeleccionados, setProductosSeleccionados] = React.useState<Producto[]>([]);
+
+
+
+    const [venta, setVenta] = React.useState<Venta[]>([]);
+    const formAgregarVentaRef = React.useRef<HTMLFormElement>(null);
 
     React.useEffect(() => {
         const calcularImporte = (): string => {
@@ -102,6 +124,24 @@ export default function ContentVentas() {
         });
     };
 
+    const agregarVenta = () => {
+        if (formAgregarVentaRef.current?.reportValidity()) {
+            const fechaActual = now(getLocalTimeZone());
+            const nuevaVenta: Venta = {
+                cliente: valueCliente,
+                celular_cliente: valueCelular?.toString(),
+                direccion_cliente: valueDireccion,
+                fecha_registro: fechaActual.toDate(),
+                metodo_pago: valueMetodoPago,
+                fecha_boleta: fechaActual.toDate(),
+                metodo_entrega: valueMetodoEntrega,
+                total_venta: parseFloat(ventaTotal),
+                productos: productosSeleccionados,
+            };
+            console.log(nuevaVenta);
+        }
+    }
+
     const columns = [
         {
             key: "producto",
@@ -127,16 +167,36 @@ export default function ContentVentas() {
                 </span>,
         }
     ];
+    const [metodosPago, setMetodosPago] = React.useState([]);
+    React.useEffect(() => {
+        fetchMetodosPago();
+    }, []);
+    const fetchMetodosPago = async () => {
+        try {
+            const response = await fetch("/api/ventas/metodosPago", {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+            });
 
-    const metodosPago = [
-        { value: 1, label: "Efectivo" },
-        { value: 2, label: "Yape" },
-        { value: 3, label: "Otros" }
-    ];
+            if (!response.ok) {
+                throw new Error("Error al obtener los métodos de pago");
+            }
+
+            const data = await response.json();
+            setMetodosPago(data);
+        } catch (error) {
+            console.error("Error al obtener los métodos de pago:", error);
+        }
+    };
+
+    // const metodosPago = [
+    //     { value: 1, label: "Efectivo" },
+    //     { value: 2, label: "Yape" },
+    //     { value: 3, label: "Otros" }
+    // ];
     const metodosEntrega = [
         { value: 1, label: "En Tienda" },
-        { value: 2, label: "Envío" },
-        { value: 3, label: "Otros" }
+        { value: 2, label: "Envío" }
     ];
 
     let list = useAsyncList<SWCharacter>({
@@ -257,47 +317,88 @@ export default function ContentVentas() {
                             </TableBody>
                         </Table>
                     </section>
-                    <section className="flex flex-col xl:grid xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-                        <div className="flex flex-col gap-4 xl:col-span-2 2xl:col-span-3">
-                            <div className="flex flex-col md:flex-row gap-4">
-                                <Input
-                                    isRequired
-                                    size="sm"
-                                    type="text"
-                                    label="Cliente"
-                                    placeholder="Ingresa el nombre del Cliente"
-                                />
+                    <form ref={formAgregarVentaRef} className="flex flex-col gap-4" >
+                        <div className="flex flex-col xl:grid xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                            <div className="flex flex-col gap-4 xl:col-span-2 2xl:col-span-3">
+                                <div className="flex flex-col md:flex-row gap-4">
+                                    <Input
+                                        isRequired
+                                        size="sm"
+                                        type="text"
+                                        label="Cliente"
+                                        placeholder="Ingresa el nombre del Cliente"
+                                        value={valueCliente}
+                                        onValueChange={setValueCliente}
+                                    />
+                                    <Select
+                                        isRequired
+                                        size="sm"
+                                        label="Método de Entrega"
+                                        placeholder="Selecciona el método de entrega"
+                                        defaultSelectedKeys={["1"]}
+                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                            const value = Number(e.target.value);
+                                            const selectedMetodoPago = metodosPago.find((metodo) => (metodo as any).value === value);
+                                            if (selectedMetodoPago) {
+                                                if ((selectedMetodoPago as any).label === "Yape") {
+                                                    setShowCelular(true);
+                                                } else {
+                                                    setShowCelular(false);
+                                                }
+                                                setValueMetodoPago((selectedMetodoPago as any).value);
+                                            }
+                                        }}
+                                    >
+                                        {metodosEntrega.map((opcion: { value: number, label: string }) => (
+                                            <SelectItem key={opcion.value} value={opcion.value}>{opcion.label}</SelectItem>
+                                        ))}
+                                    </Select>
+
+                                </div>
+                                {showDireccionCelular && (
+                                    <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
+                                        <Input
+                                            isRequired
+                                            type="text"
+                                            size="sm"
+                                            label="Dirección"
+                                            className="md:col-span-4"
+                                            placeholder="Ingresa la dirección del Cliente"
+                                        />
+                                        <Input
+                                            isRequired
+                                            type="number"
+                                            size="sm"
+                                            label="Celular"
+                                            className="md:col-span-3"
+                                            placeholder="Ingresa el número del Cliente"
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex flex-col gap-4 xl:col-span-1">
                                 <Select
                                     isRequired
                                     size="sm"
-                                    label="Método de Entrega"
-                                    placeholder="Selecciona el método de entrega"
+                                    items={metodosPago}
+                                    label="Método de pago"
+                                    placeholder="Selecciona el método pago"
                                     defaultSelectedKeys={["1"]}
                                     onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                                         const value = e.target.value;
-                                        if (value === "2") {
-                                            setShowDireccionCelular(true);
+                                        if (value === "6") {
+                                            setShowCelular(true);
                                         } else {
-                                            setShowDireccionCelular(false);
+                                            setShowCelular(false);
                                         }
+                                        setValueMetodoPago(Number(value));
                                     }}
                                 >
-                                    {metodosEntrega.map((opcion: { value: number, label: string }) => (
-                                        <SelectItem key={opcion.value} value={opcion.value}>{opcion.label}</SelectItem>
-                                    ))}
+                                    {(animal: { value: number, label: string }) => (
+                                        <SelectItem key={animal.value}>{animal.label}</SelectItem>
+                                    )}
                                 </Select>
-
-                            </div>
-                            {showDireccionCelular && (
-                                <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
-                                    <Input
-                                        isRequired
-                                        type="text"
-                                        size="sm"
-                                        label="Dirección"
-                                        className="md:col-span-4"
-                                        placeholder="Ingresa la dirección del Cliente"
-                                    />
+                                {(showDireccionCelular == false && showCelular) && (
                                     <Input
                                         isRequired
                                         type="number"
@@ -306,75 +407,43 @@ export default function ContentVentas() {
                                         className="md:col-span-3"
                                         placeholder="Ingresa el número del Cliente"
                                     />
-                                </div>
-                            )}
-                        </div>
-                        <div className="flex flex-col gap-4 xl:col-span-1">
-                            <Select
-                                isRequired
-                                size="sm"
-                                items={metodosPago}
-                                label="Método de pago"
-                                placeholder="Selecciona el método pago"
-                                defaultSelectedKeys={["1"]}
-                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                                    const value = e.target.value;
-                                    if (value === "2") {
-                                        setShowCelular(true);
-                                    } else {
-                                        setShowCelular(false);
-                                    }
-                                }}
-                            >
-                                {(animal: { value: number, label: string }) => (
-                                    <SelectItem key={animal.value}>{animal.label}</SelectItem>
                                 )}
-                            </Select>
-                            {(showDireccionCelular == false && showCelular) && (
-                                <Input
-                                    isRequired
-                                    type="number"
+                            </div>
+                            <div className="flex flex-col md:flex-row xl:flex-col gap-4 xl:col-span-1">
+                                <DatePicker
+                                    isReadOnly
+                                    label="Fecha"
                                     size="sm"
-                                    label="Celular"
-                                    className="md:col-span-3"
-                                    placeholder="Ingresa el número del Cliente"
+                                    hideTimeZone
+                                    color="primary"
+                                    showMonthAndYearPickers
+                                    defaultValue={now(getLocalTimeZone())}
                                 />
-                            )}
+                                <Input
+                                    isReadOnly
+                                    type="text"
+                                    label="Total"
+                                    size="sm"
+                                    color="success"
+                                    placeholder="0.00"
+                                    value={ventaTotal}
+                                    endContent={
+                                        <div className="pointer-events-none flex items-center">
+                                            <span className="text-default-400 text-small">S/.</span>
+                                        </div>
+                                    }
+                                />
+                            </div>
                         </div>
-                        <div className="flex flex-col md:flex-row xl:flex-col gap-4 xl:col-span-1">
-                            <DatePicker
-                                isReadOnly
-                                label="Fecha"
-                                size="sm"
-                                hideTimeZone
-                                color="primary"
-                                showMonthAndYearPickers
-                                defaultValue={now(getLocalTimeZone())}
-                            />
-                            <Input
-                                isReadOnly
-                                type="text"
-                                label="Total"
-                                size="sm"
-                                color="success"
-                                placeholder="0.00"
-                                value={ventaTotal}
-                                endContent={
-                                    <div className="pointer-events-none flex items-center">
-                                        <span className="text-default-400 text-small">S/.</span>
-                                    </div>
-                                }
-                            />
+                        <div className="flex flex-col lg:flex-row gap-4 justify-end">
+                            <Button className="font-bold" color="warning" size="lg">
+                                Cancelar Venta
+                            </Button>
+                            <Button className="font-bold" color="success" size="lg" onClick={agregarVenta}>
+                                Registrar Venta
+                            </Button>
                         </div>
-                    </section>
-                    <section className="flex flex-col lg:flex-row gap-4 justify-end">
-                        <Button className="font-bold" color="warning" size="lg">
-                            Cancelar Venta
-                        </Button>
-                        <Button className="font-bold" color="success" size="lg">
-                            Registrar Venta
-                        </Button>
-                    </section>
+                    </form>
                 </article>
             </section>
         </React.Fragment>
