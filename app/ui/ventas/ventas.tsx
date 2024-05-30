@@ -32,8 +32,6 @@ type Venta = {
 }
 
 export default function ContentVentas() {
-    const formAgregarProductoRef = React.useRef<HTMLFormElement>(null);
-    const formAgregarVentaRef = React.useRef<HTMLFormElement>(null);
     const [metodosPago, setMetodosPago] = React.useState([]);
     const metodosEntrega = [
         { value: 1, label: "En Tienda" },
@@ -45,6 +43,9 @@ export default function ContentVentas() {
     const [valueCantidad, setValueCantidad] = React.useState("1");
     const [selectedPrecioUnitario, setSelectedPrecioUnitario] = React.useState("0.00");
     const [importe, setImporte] = React.useState("0.00");
+
+    const [validName, setValidName] = React.useState(false);
+    const [validCantidad, setValidCantidad] = React.useState(false);
 
     const [showDireccionCelular, setShowDireccionCelular] = React.useState(false);
     const [showCelular, setShowCelular] = React.useState(false);
@@ -87,8 +88,9 @@ export default function ContentVentas() {
     const handleValueCantidadChange = (value: string) => {
         if (Number(value) > 0 && Number(value) <= 1000) {
             setValueCantidad(value);
+            setValidCantidad(false);
         } else {
-            setValueCantidad("1");
+            setValueCantidad("");
         }
     };
 
@@ -98,48 +100,32 @@ export default function ContentVentas() {
             setSelectedIdProducto(selectedProduct.id_producto);
             setSelectedName(selectedProduct.name);
             setSelectedPrecioUnitario(selectedProduct.precio_unitario.toString());
+            setValidName(false);
         }
     };
 
     const agregarProducto = () => {
-        console.log("Verificando la validez del formulario...");
-        console.log("Nombre seleccionado:", selectedName);
-        console.log("Cantidad:", valueCantidad);
-        console.log("Precio unitario seleccionado:", selectedPrecioUnitario);
-        console.log("Estado formulario:", formAgregarProductoRef.current?.reportValidity());
-        console.log("Estado formulario:", formAgregarProductoRef.current?.checkValidity());
-        const form = formAgregarProductoRef.current;
-        if (form) {
-            console.log("Validando campos individualmente...");
-            for (let i = 0; i < form.elements.length; i++) {
-                const element = form.elements[i] as HTMLInputElement;
-                if (element.tagName !== "BUTTON") {
-                    if (element.required && element.value.trim() === "") {
-                        console.log(`Campo '${element.name || "Unnamed"}' está vacío.`);
-                    }
-                }
-            }
-
-            console.log("Validando formulario en conjunto...");
-            console.log("Estado formulario:", form.reportValidity());
+        if (selectedName === "") {
+            setValidName(true);
+            return;
         }
-
-
-        if (formAgregarProductoRef.current?.reportValidity()) {
-            const nuevoProducto: Producto = {
-                key: idProducto || 0,
-                nombre: selectedName,
-                cantidad: Number(valueCantidad),
-                precio_unitario: parseFloat(selectedPrecioUnitario),
-                importe: parseFloat(importe),
-            };
-            const nuevosProductos = [...productosSeleccionados, nuevoProducto];
-            setProductosSeleccionados(nuevosProductos);
-            list.setFilterText("");
-            setSelectedName("");
-            setSelectedPrecioUnitario("0.00");
-            setImporte("0.00");
+        if (!Number(valueCantidad)) {
+            setValidCantidad(true);
+            return;
         }
+        const nuevoProducto: Producto = {
+            key: idProducto || 0,
+            nombre: selectedName,
+            cantidad: Number(valueCantidad),
+            precio_unitario: parseFloat(selectedPrecioUnitario),
+            importe: parseFloat(importe),
+        };
+        const nuevosProductos = [...productosSeleccionados, nuevoProducto];
+        setProductosSeleccionados(nuevosProductos);
+        list.setFilterText("");
+        setSelectedName("");
+        setSelectedPrecioUnitario("0.00");
+        setImporte("0.00");
     };
 
     const eliminarProducto = (key: number) => {
@@ -151,26 +137,24 @@ export default function ContentVentas() {
 
     const [open, setOpen] = React.useState(false);
     const agregarVenta = () => {
-        if (formAgregarVentaRef.current?.reportValidity()) {
-            if (productosSeleccionados.length === 0) {
-                setOpen(true);
-                return;
-            }
-            const fechaActual = now(getLocalTimeZone());
-            const nuevaVenta: Venta = {
-                cliente: valueCliente,
-                celular_cliente: valueCelular?.toString(),
-                direccion_cliente: valueDireccion,
-                fecha_registro: fechaActual.toDate(),
-                metodo_pago: valueMetodoPago,
-                fecha_boleta: fechaActual.toDate(),
-                metodo_entrega: valueMetodoEntrega,
-                total_venta: parseFloat(ventaTotal),
-                productos: productosSeleccionados,
-            };
-            console.log(nuevaVenta);
+        if (productosSeleccionados.length === 0) {
+            setOpen(true);
             return;
         }
+        const fechaActual = now(getLocalTimeZone());
+        const nuevaVenta: Venta = {
+            cliente: valueCliente,
+            celular_cliente: valueCelular?.toString(),
+            direccion_cliente: valueDireccion,
+            fecha_registro: fechaActual.toDate(),
+            metodo_pago: valueMetodoPago,
+            fecha_boleta: fechaActual.toDate(),
+            metodo_entrega: valueMetodoEntrega,
+            total_venta: parseFloat(ventaTotal),
+            productos: productosSeleccionados,
+        };
+        console.log(nuevaVenta);
+        return;
     }
 
     const columns = [
@@ -239,10 +223,12 @@ export default function ContentVentas() {
                     <h2 className="text-white font-bold uppercase">Registro de ventas</h2>
                 </header>
                 <article className="flex flex-col gap-4 p-4">
-                    <form id="formAgregarProducto" ref={formAgregarProductoRef} className="flex flex-col xl:grid xl:grid-cols-7 gap-4">
+                    <form className="flex flex-col xl:grid xl:grid-cols-7 gap-4">
                         <div className="xl:col-span-3">
                             <Autocomplete
                                 isRequired
+                                isInvalid={validName}
+                                errorMessage="Selecciona un producto válido"
                                 inputValue={list.filterText}
                                 isLoading={list.isLoading}
                                 items={list.items}
@@ -273,6 +259,8 @@ export default function ContentVentas() {
                             <div className="xl:col-span-1">
                                 <Input
                                     isRequired
+                                    isInvalid={validCantidad}
+                                    errorMessage="Ingresa una cantidad válida"
                                     type="number"
                                     size="sm"
                                     label="Cantidad"
@@ -343,7 +331,7 @@ export default function ContentVentas() {
                             </TableBody>
                         </Table>
                     </section>
-                    <form ref={formAgregarVentaRef} className="flex flex-col gap-4" >
+                    <form className="flex flex-col gap-4" >
                         <div className="flex flex-col xl:grid xl:grid-cols-4 2xl:grid-cols-5 gap-4">
                             <div className="flex flex-col gap-4 xl:col-span-2 2xl:col-span-3">
                                 <div className="flex flex-col md:flex-row gap-4">
