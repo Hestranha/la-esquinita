@@ -37,6 +37,12 @@ type Venta = {
     productos: Producto[];
 }
 
+type MetodoPago = {
+    value: number | string;
+    label: string;
+};
+
+
 export default function ContentVentas() {
     const longitudCliente = 80;
     const longitudCelular = 15;
@@ -64,7 +70,6 @@ export default function ContentVentas() {
     const [showCelular, setShowCelular] = React.useState(false);
 
     const [validCliente, setValidCliente] = React.useState(false);
-    const regexCliente = /^[a-zA-Z\s]*$/;
     const [validMetodoEntrega, setValidMetodoEntrega] = React.useState(false);
     const [validDireccion, setValidDireccion] = React.useState(false);
     const [validCelular, setValidCelular] = React.useState(false);
@@ -120,7 +125,7 @@ export default function ContentVentas() {
     };
 
     const handleValueCliente = (value: string) => {
-        if (regexCliente.test(value) && value.length <= longitudCliente) {
+        if (value.length <= longitudCliente) {
             setValueCliente(value);
             setValidCliente(false);
         }
@@ -202,7 +207,7 @@ export default function ContentVentas() {
                 return;
             }
         }
-        if (valueMetodoEntrega !== 1 && valueMetodoPago === 1) {
+        if (valueMetodoEntrega !== 2 && ((metodosPago as any).find((metodo: MetodoPago) => metodo.value === valueMetodoPago).label === "Yape")) {
             if (!Number(valueCelular)) {
                 setValidCelular(true);
                 return;
@@ -463,6 +468,8 @@ export default function ContentVentas() {
                                             if (value === "2") {
                                                 setShowDireccionCelular(true);
                                             } else {
+                                                setValueDireccion("");
+                                                setValueCelular("");
                                                 setShowDireccionCelular(false);
                                             }
                                             setValueMetodoEntrega(Number(value));
@@ -519,6 +526,7 @@ export default function ContentVentas() {
                                             if ((selectedMetodoPago as any).label === "Yape") {
                                                 setShowCelular(true);
                                             } else {
+                                                setValueCelular("");
                                                 setShowCelular(false);
                                             }
                                             setValueMetodoPago((selectedMetodoPago as any).value);
