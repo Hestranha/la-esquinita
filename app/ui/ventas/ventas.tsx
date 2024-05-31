@@ -1,14 +1,15 @@
 "use client";
 import React from "react";
-import { Input, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip, Button, DatePicker, getKeyValue, Autocomplete, AutocompleteItem } from "@nextui-org/react";
+import { Input, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip, Button, DatePicker, getKeyValue, Autocomplete, AutocompleteItem, Modal, useDisclosure } from "@nextui-org/react";
 import { DeleteIcon } from "../components/DeleteIcon";
-import { getLocalTimeZone, now } from "@internationalized/date";
+import { now, getLocalTimeZone } from "@internationalized/date";
 import { useAsyncList } from "@react-stately/data";
 
 import Alert from '@mui/material/Alert';
 import Grow from "@mui/material/Grow";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
+import { RegistrarVenta } from "./components/registrarVenta";
 
 type SWCharacter = {
     id_producto: number;
@@ -28,9 +29,9 @@ type Venta = {
     cliente: string;
     celular_cliente?: string;
     direccion_cliente?: string;
-    fecha_registro: Date;
+    fecha_registro: string;
     metodo_pago: number;
-    fecha_boleta: Date;
+    fecha_boleta: string;
     metodo_entrega: number;
     total_venta: number;
     productos: Producto[];
@@ -40,6 +41,8 @@ export default function ContentVentas() {
     const longitudCliente = 80;
     const longitudCelular = 15;
     const longitudDireccion = 100;
+
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
     const [metodosPago, setMetodosPago] = React.useState([]);
     const metodosEntrega = [
@@ -74,7 +77,15 @@ export default function ContentVentas() {
     const [ventaTotal, setVentaTotal] = React.useState("0.00");
     const [productosSeleccionados, setProductosSeleccionados] = React.useState<Producto[]>([]);
 
-    const [venta, setVenta] = React.useState<Venta[]>([]);
+    const [venta, setVenta] = React.useState<Venta>({
+        cliente: "",
+        fecha_registro: "",
+        metodo_pago: 0,
+        fecha_boleta: "",
+        metodo_entrega: 0,
+        total_venta: 0,
+        productos: []
+    });
 
     React.useEffect(() => {
         const calcularImporte = (): string => {
@@ -172,6 +183,7 @@ export default function ContentVentas() {
 
     const [open, setOpen] = React.useState(false);
     const agregarVenta = () => {
+        onOpen();
         if (valueCliente === "") {
             setValidCliente(true);
             return;
@@ -203,18 +215,19 @@ export default function ContentVentas() {
         }
 
         const fechaActual = now(getLocalTimeZone());
+        const fechaOrdenada = `${String(fechaActual.day).padStart(2, '0')}/${String(fechaActual.month).padStart(2, '0')}/${fechaActual.year} ${String(fechaActual.hour).padStart(2, '0')}:${String(fechaActual.minute).padStart(2, '0')}:${String(fechaActual.second).padStart(2, '0')}`;
         const nuevaVenta: Venta = {
             cliente: valueCliente,
             celular_cliente: valueCelular?.toString(),
             direccion_cliente: valueDireccion,
-            fecha_registro: fechaActual.toDate(),
+            fecha_registro: fechaOrdenada,
             metodo_pago: valueMetodoPago,
-            fecha_boleta: fechaActual.toDate(),
+            fecha_boleta: fechaOrdenada,
             metodo_entrega: valueMetodoEntrega,
             total_venta: parseFloat(ventaTotal),
             productos: productosSeleccionados,
         };
-        console.log(nuevaVenta);
+        setVenta(nuevaVenta);
     }
 
     const columns = [
@@ -278,6 +291,17 @@ export default function ContentVentas() {
 
     return (
         <React.Fragment>
+            <Modal
+                hideCloseButton
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+                isDismissable={false}
+                isKeyboardDismissDisabled={true}
+                placement="center"
+                scrollBehavior="inside"
+            >
+                <RegistrarVenta registrarVenta={venta} />
+            </Modal>
             <Grow in={open} className="absolute m-4 bottom-0 left-0 z-50">
                 <Alert
                     severity="error"
@@ -497,7 +521,7 @@ export default function ContentVentas() {
                                             } else {
                                                 setShowCelular(false);
                                             }
-                                            setValueMetodoEntrega((selectedMetodoPago as any).value);
+                                            setValueMetodoPago((selectedMetodoPago as any).value);
                                         }
                                     }}
                                 >
