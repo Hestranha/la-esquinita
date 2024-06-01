@@ -188,7 +188,6 @@ export default function ContentVentas() {
 
     const [open, setOpen] = React.useState(false);
     const agregarVenta = () => {
-        onOpen();
         if (valueCliente === "") {
             setValidCliente(true);
             return;
@@ -218,7 +217,6 @@ export default function ContentVentas() {
             setOpen(true);
             return;
         }
-
         const fechaActual = now(getLocalTimeZone());
         const fechaOrdenada = `${String(fechaActual.day).padStart(2, '0')}/${String(fechaActual.month).padStart(2, '0')}/${fechaActual.year} ${String(fechaActual.hour).padStart(2, '0')}:${String(fechaActual.minute).padStart(2, '0')}:${String(fechaActual.second).padStart(2, '0')}`;
         const nuevaVenta: Venta = {
@@ -233,6 +231,7 @@ export default function ContentVentas() {
             productos: productosSeleccionados,
         };
         setVenta(nuevaVenta);
+        onOpen();
     }
 
     const columns = [
@@ -579,7 +578,7 @@ export default function ContentVentas() {
                             </div>
                         </div>
                         <div className="flex flex-col lg:flex-row gap-4 justify-end">
-                            <Button className="font-bold" color="warning" size="lg">
+                            <Button className="font-bold" variant="flat" color="warning" size="lg">
                                 Cancelar Venta
                             </Button>
                             <Button className="font-bold" color="success" size="lg" onClick={agregarVenta}>
