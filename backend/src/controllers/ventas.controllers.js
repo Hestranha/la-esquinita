@@ -162,10 +162,13 @@ export async function setSubirVenta(req, res) {
 
 		// Insertar detalle de boleta
 		for (const producto of productos) {
-			const { id_producto, precio_venta, cantidad_venta } = producto;
+			const { key, precio_unitario, importe } = producto;
+			console.log(key);
+			console.log(precio_unitario);
+			console.log(importe);
 			await pool.query(
 				`INSERT INTO detalle_boleta (numero_boleta, id_producto, precio_venta, cantidad_venta) VALUES (?, ?, ?, ?)`,
-				[numero_boleta, id_producto, precio_venta, cantidad_venta]
+				[numero_boleta, key, precio_unitario, importe]
 			);
 		}
 
