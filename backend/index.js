@@ -1,9 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import ventasRoutes from "./src/routes/ventas.routes.js";
-import loginRoutes from "./src/routes/login.routes.js";
 import cookieParser from "cookie-parser";
-import * as authorization from "./src/middlewares/authorization.js";
 import cors from "cors";
 
 //Intialization
@@ -18,14 +16,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 //Routes
-app.get("/", authorization.soloPublico, (req, res) => {
+app.get("/", (req, res) => {
 	res.render(`
 		<h1>Funcionando</h1>
 		`);
 });
 
 app.use(cookieParser());
-app.use(loginRoutes);
 app.use(ventasRoutes);
 
 //Run Server
