@@ -10,8 +10,8 @@ async function getUltimoNumeroBoleta2() {
         `);
 
 		// Manejo del caso cuando no haya resultados
-		const num_boleta = rows[0]?.ultimo_numero_boleta || "101";
-		console.log(rows[0]?.ultimo_numero_boleta);
+		const num_boleta = rows[0]?.ultimo_numero_boleta || null;
+		console.log("num_boleta: ", rows[0]?.ultimo_numero_boleta);
 		return `${num_boleta + 1}`;
 	} catch (error) {
 		console.error("Error en getUltimoNumeroBoleta:", error);
