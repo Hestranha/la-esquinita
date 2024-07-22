@@ -86,7 +86,7 @@ export function RegistrarVenta({ registrarVenta }: { registrarVenta: Venta }) {
         fetchUltimoNumeroBoleta();
         console.log(registrarVenta);
         try {
-            const response = await fetch('/api/subirVenta', {
+            const response = await fetch('/api/ventas/subirVenta', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
