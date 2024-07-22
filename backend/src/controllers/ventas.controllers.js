@@ -2,12 +2,19 @@ import pool from "../database.js";
 
 export async function getUltimoNumeroBoleta(req, res) {
 	try {
-		const [num_boleta] = await pool.query(
-			"SELECT obtener_ultimo_numero_boleta() AS ultimo_numero_boleta"
-		);
+		const [rows] = await pool.query(`
+            SELECT numero_boleta AS ultimo_numero_boleta
+            FROM boleta
+            ORDER BY fecha_boleta DESC
+            LIMIT 1
+        `);
+
+		// Asegúrate de que se maneje el caso cuando no haya resultados
+		const num_boleta = rows[0]?.ultimo_numero_boleta || null;
 
 		res.json(num_boleta);
 	} catch (error) {
+		console.error("Error en getUltimoNumeroBoleta:", error);
 		res.status(500).json({ message: error.message });
 	}
 }
