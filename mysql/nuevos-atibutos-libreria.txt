@@ -1,0 +1,34 @@
+Ventas:
+para la busqueda en producto se puede agregar un nuevo atributo de "vecesvendidas" o algo asi donde vaya incrementand cada vez que se realice una venta de ese producto, y ordenarla dependiendo de eso, seria como una busqueda indexada?, tambien hacer una correccion o una mejora al momento de agregar productos, por ejemplo si agregue el producto cuaderno 2, y luego un lapiz 2, y luego nuevamente quiero agregar cuaderno pero esta vez 4, no se debe de agregar o no debe tener cuaderno 2 y cuadern 4 en la tabla, se deberia de sumar si es el mismo producto.
+
+En el ticket o boleta puede aparecer un qr donde indiquen datos adicionales acerca de la venta, por ejemlo puede contener el id del empleado que le atendio
+
+agregar un atributo de descripcion/nota? acerca de la venta o compra
+
+añadir atributo a la tabla cliente, sexo -> depende de la necesidad de la tienda, si desea realizar algun analisis acerca de la influencia en el sexo de la persona
+
+agregar boton borrador venta en la seccion de registrar venta? esto serviria para cuando se esta haciendo el llenado de una venta, o completando ventas antiguas o pedidos, y llega un cliente nuevo y al no poder continuar registrando esa venta pendiente se guarda un borrador de ese registro de venta en un apartado llamado Pendientes (seria cambiarlo a borrador no lo se), donde aparecen todos los registros de ventas en borrados que se podran editar para posteriormente registrar la venta realizada.
+
+
+HISTORIAL DE VENTAS:
+principales:
+nombre_cliente
+nombre_metodo_pago
+fecha_boleta
+total_boleta
+
+HISTORIAL DE COMPRAS:
+principales:
+nombre_proveedor
+nombre_metodo_pago
+total_factura
+fecha_factura
+
+INVENTARIO:
+principales:
+nombre_producto
+nombre_marca
+precio_unitario
+stock_disponible
+estado_producto
+

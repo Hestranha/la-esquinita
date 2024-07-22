@@ -90,43 +90,59 @@ export async function getBuscarProducto(req, res) {
 
 export async function setSubirVenta(req, res) {
 	const {
-		cliente,
+		nombre_cliente,
 		celular_cliente,
 		direccion_cliente,
-		fecha_registro,
-		metodo_pago,
+		fecha_registro_cliente,
+		id_metodo_pago,
 		fecha_boleta,
 		metodo_entrega,
-		total_venta,
+		total_boleta,
 		productos,
+		DNI_empleado,
 	} = req.body;
 
-	const productos_json = JSON.stringify(productos);
-
 	try {
+		// Insertar cliente
+		const [clienteResult] = await pool.query(
+			`INSERT INTO cliente (nombre_cliente, celular_cliente, direccion_cliente, fecha_registro_cliente) VALUES (?, ?, ?, ?)`,
+			[
+				nombre_cliente,
+				celular_cliente,
+				direccion_cliente,
+				fecha_registro_cliente,
+			]
+		);
+		const id_cliente = clienteResult.insertId;
+
 		// Obtener el último número de boleta
 		const [num_boleta_result] = await pool.query(
 			`SELECT LPAD(SUBSTRING((SELECT MAX(numero_boleta) FROM boleta), 4) + 1, 6, '0') AS numero_boleta`
 		);
 		const numero_boleta = num_boleta_result[0].numero_boleta;
 
-		// Insertar cliente
-		await pool.query(
-			`INSERT INTO cliente (nombre, celular, direccion, fecha_registro) VALUES (?, ?, ?, ?)`,
-			[cliente, celular_cliente, direccion_cliente, fecha_registro]
-		);
-
 		// Insertar boleta
 		await pool.query(
-			`INSERT INTO boleta (numero_boleta, metodo_pago_id, fecha_boleta, metodo_entrega_id, total_venta) VALUES (?, ?, ?, ?, ?)`,
-			[numero_boleta, metodo_pago, fecha_boleta, metodo_entrega, total_venta]
+			`INSERT INTO boleta (numero_boleta, DNI_empleado, id_cliente, id_metodo_pago, metodo_entrega, fecha_boleta, total_boleta) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+			[
+				numero_boleta,
+				DNI_empleado,
+				id_cliente,
+				id_metodo_pago,
+				metodo_entrega,
+				fecha_boleta,
+				total_boleta,
+			]
 		);
 
 		// Insertar detalle de boleta
-		await pool.query(
-			`INSERT INTO detalle_boleta (numero_boleta, productos) VALUES (?, ?)`,
-			[numero_boleta, productos_json]
-		);
+		for (const producto of productos) {
+			const { id_producto, precio_venta, cantidad_venta } = producto;
+			await pool.query(
+				`INSERT INTO detalle_boleta (numero_boleta, id_producto, precio_venta, cantidad_venta) VALUES (?, ?, ?, ?)`,
+				[numero_boleta, id_producto, precio_venta, cantidad_venta]
+			);
+		}
 
 		res.status(200).json({ message: "Venta registrada exitosamente" });
 	} catch (error) {
