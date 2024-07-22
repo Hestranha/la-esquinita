@@ -1,6 +1,6 @@
 import express from "express";
 import morgan from "morgan";
-import ventasRoutes from "./src/routes/ventas.routes.js.js";
+import ventasRoutes from "./src/routes/ventas.routes.js";
 import loginRoutes from "./src/routes/login.routes.js";
 import cookieParser from "cookie-parser";
 import * as authorization from "./src/middlewares/authorization.js";
@@ -11,9 +11,7 @@ const app = express();
 
 //Settings
 app.set("port", process.env.PORT || 4000);
-app.use(
-	cors({ origin: "https://la-esquinita.vercel.app/ventas", credentials: true })
-);
+app.use(cors({ origin: "https://la-esquinita.vercel.app", credentials: true }));
 //Middlewares
 app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: false }));
@@ -21,7 +19,9 @@ app.use(express.json());
 
 //Routes
 app.get("/", authorization.soloPublico, (req, res) => {
-	res.render("xdd");
+	res.render(`
+		<h1>Funcionando</h1>
+		`);
 });
 
 app.use(cookieParser());
@@ -32,5 +32,3 @@ app.use(ventasRoutes);
 app.listen(app.get("port"), () =>
 	console.log("Server listening on port", app.get("port"))
 );
-
-export default app;
