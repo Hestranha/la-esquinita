@@ -8,7 +8,7 @@ const app = express();
 
 //Settings
 app.set("port", process.env.PORT || 4000);
-app.use(cors({ origin: "https://la-esquinita.vercel.app", credentials: true }));
+app.use(cors());
 //Middlewares
 app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: false }));
