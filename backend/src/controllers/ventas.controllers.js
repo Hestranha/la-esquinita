@@ -9,11 +9,13 @@ async function getUltimoNumeroBoleta2() {
             LIMIT 1
         `);
 
-		// Manejo del caso cuando no haya resultados
 		const num_boleta = rows[0]?.ultimo_numero_boleta || null;
-		console.log("num_boleta: ", rows[0]?.ultimo_numero_boleta);
-		console.log("num_boleta_asubir: ", parseInt(num_boleta) + 1);
-		return `${parseInt(num_boleta) + 1}`;
+		const num_boleta_int = parseInt(num_boleta.slice(3), 10) || 0;
+		const nuevo_num_boleta = (num_boleta_int + 1).toString().padStart(4, "0");
+		console.log("num voleta bd: ", num_boleta);
+		console.log("num entero: ", num_boleta_int);
+		console.log(`BOL${nuevo_num_boleta}`);
+		return `BOL${nuevo_num_boleta}`;
 	} catch (error) {
 		console.error("Error en getUltimoNumeroBoleta:", error);
 		throw new Error("Error al obtener el último número de boleta");
