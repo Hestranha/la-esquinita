@@ -113,36 +113,3 @@ export async function getBuscarProducto(req, res) {
 		res.status(500).json({ message: error.message });
 	}
 }
-
-export async function setSubirVenta(req, res) {
-	const {
-		cliente,
-		celular_cliente,
-		direccion_cliente,
-		fecha_registro,
-		metodo_pago,
-		fecha_boleta,
-		metodo_entrega,
-		total_venta,
-		productos,
-	} = req.body;
-
-	const productos_json = JSON.stringify(productos);
-
-	try {
-		await pool.query(`CALL InsertarVenta(?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
-			cliente,
-			celular_cliente,
-			direccion_cliente,
-			fecha_registro,
-			metodo_pago,
-			fecha_boleta,
-			metodo_entrega,
-			total_venta,
-			productos_json,
-		]);
-		res.status(200).json({ message: "Venta registrada exitosamente" });
-	} catch (error) {
-		res.status(500).json({ message: error.message });
-	}
-}
