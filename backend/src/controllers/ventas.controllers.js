@@ -103,6 +103,21 @@ export async function setSubirVenta(req, res) {
 
 	const productos_json = JSON.stringify(productos);
 
+	// Función para convertir la fecha al formato MySQL
+	function convertToMySQLDate(dateString) {
+		const [day, month, year] = dateString.split("/");
+		return `${year}-${month}-${day}`;
+	}
+
+	function convertToMySQLDateTime(dateTimeString) {
+		const [datePart, timePart] = dateTimeString.split(" ");
+		const [day, month, year] = datePart.split("/");
+		return `${year}-${month}-${day} ${timePart}`;
+	}
+
+	const fecha_registro_cliente = convertToMySQLDateTime(fecha_registro);
+	const fecha_boleta_mysql = convertToMySQLDateTime(fecha_boleta);
+
 	try {
 		// Obtener el último número de boleta
 		const [num_boleta_result] = await pool.query(
@@ -113,20 +128,29 @@ export async function setSubirVenta(req, res) {
 		// Insertar cliente
 		await pool.query(
 			`INSERT INTO cliente (nombre_cliente, celular_cliente, direccion_cliente, fecha_registro_cliente) VALUES (?, ?, ?, ?)`,
-			[cliente, celular_cliente, direccion_cliente, fecha_registro]
+			[cliente, celular_cliente, direccion_cliente, fecha_registro_cliente]
 		);
 
 		// Insertar boleta
 		await pool.query(
 			`INSERT INTO boleta (numero_boleta, id_metodo_pago, fecha_boleta, metodo_entrega, total_boleta) VALUES (?, ?, ?, ?, ?)`,
-			[numero_boleta, metodo_pago, fecha_boleta, metodo_entrega, total_venta]
+			[
+				numero_boleta,
+				metodo_pago,
+				fecha_boleta_mysql,
+				metodo_entrega,
+				total_venta,
+			]
 		);
 
 		// Insertar detalle de boleta
-		await pool.query(
-			`INSERT INTO detalle_boleta (numero_boleta, productos) VALUES (?, ?)`,
-			[numero_boleta, productos_json]
-		);
+		for (const producto of productos) {
+			const { id_producto, precio_venta, cantidad_venta } = producto;
+			await pool.query(
+				`INSERT INTO detalle_boleta (numero_boleta, id_producto, precio_venta, cantidad_venta) VALUES (?, ?, ?, ?)`,
+				[numero_boleta, id_producto, precio_venta, cantidad_venta]
+			);
+		}
 
 		res.status(200).json({ message: "Venta registrada exitosamente" });
 	} catch (error) {
