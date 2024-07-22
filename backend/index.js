@@ -1,7 +1,6 @@
 import express from "express";
 import morgan from "morgan";
 import ventasRoutes from "./src/routes/ventas.routes.js";
-import cookieParser from "cookie-parser";
 import cors from "cors";
 
 //Intialization
@@ -17,12 +16,9 @@ app.use(express.json());
 
 //Routes
 app.get("/", (req, res) => {
-	res.render(`
-		<h1>Funcionando</h1>
-		`);
+	res.send("funcionando");
 });
 
-app.use(cookieParser());
 app.use(ventasRoutes);
 
 //Run Server
