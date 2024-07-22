@@ -1,5 +1,21 @@
 import pool from "../database.js";
 
+async function getUltimoNumeroBoleta2() {
+	try {
+		const [rows] = await pool.query(`
+            SELECT LPAD(SUBSTRING(MAX(numero_boleta), 4) + 1, 6, '0') AS numero_boleta
+            FROM boleta
+        `);
+
+		// Manejo del caso cuando no haya resultados
+		const num_boleta = rows[0]?.numero_boleta || "000001";
+		return `BOL${num_boleta}`;
+	} catch (error) {
+		console.error("Error en getUltimoNumeroBoleta:", error);
+		throw new Error("Error al obtener el último número de boleta");
+	}
+}
+
 export async function getUltimoNumeroBoleta(req, res) {
 	try {
 		const [rows] = await pool.query(`
@@ -120,11 +136,7 @@ export async function setSubirVenta(req, res) {
 
 	try {
 		// Obtener el último número de boleta
-		const [num_boleta_result] = await pool.query(
-			`SELECT LPAD(SUBSTRING((SELECT MAX(numero_boleta) FROM boleta), 4) + 1, 6, '0') AS numero_boleta`
-		);
-		const numero_boleta = num_boleta_result[0].numero_boleta;
-		console.log(numero_boleta);
+		const numero_boleta = await getUltimoNumeroBoleta2();
 		const dni_emp = "01234567";
 
 		// Insertar cliente y obtener el ID del cliente recién insertado
@@ -159,6 +171,7 @@ export async function setSubirVenta(req, res) {
 
 		res.status(200).json({ message: "Venta registrada exitosamente" });
 	} catch (error) {
+		console.error("Error en setSubirVenta:", error);
 		res.status(500).json({ message: error.message });
 	}
 }
