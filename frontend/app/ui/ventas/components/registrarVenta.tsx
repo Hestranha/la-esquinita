@@ -80,11 +80,29 @@ export function RegistrarVenta({ registrarVenta }: { registrarVenta: Venta }) {
         }
     };
 
-    const confirmar = () => {
+    const confirmar = async () => {
         handlePrint();
         setConfirmarVenta(true);
         fetchUltimoNumeroBoleta();
         console.log(registrarVenta);
+        try {
+            const response = await fetch('/api/subir-venta', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(registrarVenta)
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al registrar la venta');
+            }
+
+            const data = await response.json();
+            console.log(data.message);
+        } catch (error: any) {
+            console.error(error.message);
+        }
     };
 
     return (
