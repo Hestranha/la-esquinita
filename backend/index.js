@@ -1,9 +1,9 @@
 import express from "express";
 import morgan from "morgan";
-import ventasRoutes from "./routes/ventas.routes.js";
-import loginRoutes from "./routes/login.routes.js";
+import ventasRoutes from "./src/routes/ventas.routes.js.js";
+import loginRoutes from "./src/routes/login.routes.js";
 import cookieParser from "cookie-parser";
-import * as authorization from "./middlewares/authorization.js";
+import * as authorization from "./src/middlewares/authorization.js";
 import cors from "cors";
 
 //Intialization
