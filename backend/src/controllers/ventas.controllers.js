@@ -3,13 +3,15 @@ import pool from "../database.js";
 async function getUltimoNumeroBoleta2() {
 	try {
 		const [rows] = await pool.query(`
-            SELECT LPAD(SUBSTRING(MAX(numero_boleta), 4) + 1, 6, '0') AS numero_boleta
+            SELECT numero_boleta AS ultimo_numero_boleta
             FROM boleta
+            ORDER BY fecha_boleta DESC
+            LIMIT 1
         `);
 
 		// Manejo del caso cuando no haya resultados
-		const num_boleta = rows[0]?.numero_boleta || "000001";
-		return `BOL${num_boleta}`;
+		const num_boleta = rows[0]?.ultimo_numero_boleta || "000101";
+		return `BOL${num_boleta + 1}`;
 	} catch (error) {
 		console.error("Error en getUltimoNumeroBoleta:", error);
 		throw new Error("Error al obtener el último número de boleta");
