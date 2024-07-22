@@ -1,50 +1,24 @@
 import pool from "../database.js";
 
-export async function setSubirVenta(req, res) {
-	const {
-		cliente,
-		celular_cliente,
-		direccion_cliente,
-		fecha_registro,
-		metodo_pago,
-		fecha_boleta,
-		metodo_entrega,
-		total_venta,
-		productos,
-	} = req.body;
-
-	const productos_json = JSON.stringify(productos);
-
+export async function getUltimoNumeroBoleta(req, res) {
 	try {
-		// Obtener el último número de boleta
-		const [num_boleta_result] = await pool.query(
-			`SELECT LPAD(SUBSTRING((SELECT MAX(numero_boleta) FROM boleta), 4) + 1, 6, '0') AS numero_boleta`
-		);
-		const numero_boleta = num_boleta_result[0].numero_boleta;
+		const [rows] = await pool.query(`
+            SELECT numero_boleta AS ultimo_numero_boleta
+            FROM boleta
+            ORDER BY fecha_boleta DESC
+            LIMIT 1
+        `);
 
-		// Insertar cliente
-		await pool.query(
-			`INSERT INTO cliente (nombre, celular, direccion, fecha_registro) VALUES (?, ?, ?, ?)`,
-			[cliente, celular_cliente, direccion_cliente, fecha_registro]
-		);
+		// Asegúrate de que se maneje el caso cuando no haya resultados
+		const num_boleta = rows[0]?.ultimo_numero_boleta || null;
 
-		// Insertar boleta
-		await pool.query(
-			`INSERT INTO boleta (numero_boleta, metodo_pago_id, fecha_boleta, metodo_entrega_id, total_venta) VALUES (?, ?, ?, ?, ?)`,
-			[numero_boleta, metodo_pago, fecha_boleta, metodo_entrega, total_venta]
-		);
-
-		// Insertar detalle de boleta
-		await pool.query(
-			`INSERT INTO detalle_boleta (numero_boleta, productos) VALUES (?, ?)`,
-			[numero_boleta, productos_json]
-		);
-
-		res.status(200).json({ message: "Venta registrada exitosamente" });
+		res.json({ ultimo_numero_boleta: num_boleta });
 	} catch (error) {
+		console.error("Error en getUltimoNumeroBoleta:", error);
 		res.status(500).json({ message: error.message });
 	}
 }
+
 export async function getMetodoPagoProducto(req, res) {
 	try {
 		const [metodosPago] = await pool.query(
@@ -109,6 +83,52 @@ export async function getBuscarProducto(req, res) {
 		};
 
 		res.json(response);
+	} catch (error) {
+		res.status(500).json({ message: error.message });
+	}
+}
+
+export async function setSubirVenta(req, res) {
+	const {
+		cliente,
+		celular_cliente,
+		direccion_cliente,
+		fecha_registro,
+		metodo_pago,
+		fecha_boleta,
+		metodo_entrega,
+		total_venta,
+		productos,
+	} = req.body;
+
+	const productos_json = JSON.stringify(productos);
+
+	try {
+		// Obtener el último número de boleta
+		const [num_boleta_result] = await pool.query(
+			`SELECT LPAD(SUBSTRING((SELECT MAX(numero_boleta) FROM boleta), 4) + 1, 6, '0') AS numero_boleta`
+		);
+		const numero_boleta = num_boleta_result[0].numero_boleta;
+
+		// Insertar cliente
+		await pool.query(
+			`INSERT INTO cliente (nombre, celular, direccion, fecha_registro) VALUES (?, ?, ?, ?)`,
+			[cliente, celular_cliente, direccion_cliente, fecha_registro]
+		);
+
+		// Insertar boleta
+		await pool.query(
+			`INSERT INTO boleta (numero_boleta, metodo_pago_id, fecha_boleta, metodo_entrega_id, total_venta) VALUES (?, ?, ?, ?, ?)`,
+			[numero_boleta, metodo_pago, fecha_boleta, metodo_entrega, total_venta]
+		);
+
+		// Insertar detalle de boleta
+		await pool.query(
+			`INSERT INTO detalle_boleta (numero_boleta, productos) VALUES (?, ?)`,
+			[numero_boleta, productos_json]
+		);
+
+		res.status(200).json({ message: "Venta registrada exitosamente" });
 	} catch (error) {
 		res.status(500).json({ message: error.message });
 	}
