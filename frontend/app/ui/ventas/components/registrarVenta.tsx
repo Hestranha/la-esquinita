@@ -72,7 +72,7 @@ export function RegistrarVenta({ registrarVenta }: { registrarVenta: Venta }) {
             }
 
             const data = await response.json();
-            const ultimoNumeroBoleta = data[0].ultimo_numero_boleta;
+            const ultimoNumeroBoleta = data.ultimo_numero_boleta;
             setNumeroBoleta(ultimoNumeroBoleta);
             console.log(ultimoNumeroBoleta);
         } catch (error) {
@@ -86,7 +86,7 @@ export function RegistrarVenta({ registrarVenta }: { registrarVenta: Venta }) {
         fetchUltimoNumeroBoleta();
         console.log(registrarVenta);
         try {
-            const response = await fetch('/api/subir-venta', {
+            const response = await fetch('/api/subirVenta', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
