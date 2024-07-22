@@ -4,7 +4,7 @@ module.exports = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:4000/:path*', // Proxy to Backend
+        destination: 'https://la-esquinita-backend.vercel.app/:path*', // Proxy to Backend
       },
     ];
   },
