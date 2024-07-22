@@ -124,23 +124,27 @@ export async function setSubirVenta(req, res) {
 			`SELECT LPAD(SUBSTRING((SELECT MAX(numero_boleta) FROM boleta), 4) + 1, 6, '0') AS numero_boleta`
 		);
 		const numero_boleta = num_boleta_result[0].numero_boleta;
+		console.log(numero_boleta);
 		const dni_emp = "01234567";
-		// Insertar cliente
-		await pool.query(
+
+		// Insertar cliente y obtener el ID del cliente recién insertado
+		const [cliente_result] = await pool.query(
 			`INSERT INTO cliente (nombre_cliente, celular_cliente, direccion_cliente, fecha_registro_cliente) VALUES (?, ?, ?, ?)`,
 			[cliente, celular_cliente, direccion_cliente, fecha_registro_cliente]
 		);
+		const id_cliente = cliente_result.insertId;
 
 		// Insertar boleta
 		await pool.query(
-			`INSERT INTO boleta (numero_boleta, id_metodo_pago, fecha_boleta, metodo_entrega, total_boleta, DNI_empleado) VALUES (?, ?, ?, ?, ?,?)`,
+			`INSERT INTO boleta (numero_boleta, DNI_empleado, id_cliente, id_metodo_pago, fecha_boleta, metodo_entrega, total_boleta) VALUES (?, ?, ?, ?, ?, ?, ?)`,
 			[
 				numero_boleta,
+				dni_emp,
+				id_cliente,
 				metodo_pago,
 				fecha_boleta_mysql,
 				metodo_entrega,
 				total_venta,
-				dni_emp,
 			]
 		);
 
